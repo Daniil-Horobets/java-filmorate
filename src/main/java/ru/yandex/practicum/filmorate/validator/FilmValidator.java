@@ -1,20 +1,14 @@
 package ru.yandex.practicum.filmorate.validator;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.bind.annotation.RequestMethod;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 
 import java.time.LocalDate;
-import java.util.HashMap;
 
 @Slf4j
 public class FilmValidator {
-    public static void validateFilm(Film film, HashMap<Integer, Film> films, RequestMethod method) {
-        if (!films.containsKey(film.getId()) && method.equals(RequestMethod.PUT)) {
-            log.error("ValidationException: {}", "Film with id: " + film.getId() + " does not exist");
-            throw new ValidationException("Film with id: " + film.getId() + " does not exist");
-        }
+    public static void validateFilm(Film film) {
         if (film.getName() == null || film.getName().isBlank()) {
             log.error("ValidationException: {}", "Film name shouldn't not be blank");
             throw new ValidationException("Film name shouldn't not be blank");

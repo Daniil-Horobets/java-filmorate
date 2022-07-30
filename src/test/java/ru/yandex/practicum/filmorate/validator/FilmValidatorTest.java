@@ -35,7 +35,7 @@ class FilmValidatorTest {
         film.setName("");
 
         assertThrows(ValidationException.class,
-                () -> FilmValidator.validateFilm(film, filmsMap, RequestMethod.PUT));
+                () -> FilmValidator.validateFilm(film));
     }
 
     @Test
@@ -43,7 +43,7 @@ class FilmValidatorTest {
         film.setDescription(LONG_DESCRIPTION);
 
         assertThrows(ValidationException.class,
-                () ->FilmValidator.validateFilm(film, filmsMap, RequestMethod.PUT));
+                () ->FilmValidator.validateFilm(film));
     }
 
     @Test
@@ -51,7 +51,7 @@ class FilmValidatorTest {
         film.setReleaseDate(LocalDate.of(1895, 12, 27));
 
         assertThrows(ValidationException.class,
-                () -> FilmValidator.validateFilm(film, filmsMap, RequestMethod.PUT));
+                () -> FilmValidator.validateFilm(film));
     }
 
     @Test
@@ -59,7 +59,7 @@ class FilmValidatorTest {
         film.setDuration(-1);
 
         assertThrows(ValidationException.class,
-                () -> FilmValidator.validateFilm(film, filmsMap, RequestMethod.PUT));
+                () -> FilmValidator.validateFilm(film));
     }
 
 
@@ -69,6 +69,6 @@ class FilmValidatorTest {
         filmsMap.put(2, film1);
 
         assertThrows(ValidationException.class,
-                () -> FilmValidator.validateFilm(film1, filmsMap, RequestMethod.PUT));
+                () -> FilmValidator.validateFilm(film1));
     }
 }
