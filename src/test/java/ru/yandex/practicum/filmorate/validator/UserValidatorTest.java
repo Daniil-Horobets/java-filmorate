@@ -31,7 +31,7 @@ class UserValidatorTest {
         user.setEmail("");
 
         assertThrows(ValidationException.class,
-                () -> UserValidator.validateUser(user, usersMap, RequestMethod.PUT));
+                () -> UserValidator.validateUser(user));
     }
 
     @Test
@@ -39,7 +39,7 @@ class UserValidatorTest {
         user.setEmail("email.com");
 
         assertThrows(ValidationException.class,
-                () -> UserValidator.validateUser(user, usersMap, RequestMethod.PUT));
+                () -> UserValidator.validateUser(user));
     }
 
     @Test
@@ -47,12 +47,12 @@ class UserValidatorTest {
         user.setLogin("");
 
         assertThrows(ValidationException.class,
-                () -> UserValidator.validateUser(user, usersMap, RequestMethod.PUT));
+                () -> UserValidator.validateUser(user));
 
         user.setLogin("Log in");
 
         assertThrows(ValidationException.class,
-                () -> UserValidator.validateUser(user, usersMap, RequestMethod.PUT));
+                () -> UserValidator.validateUser(user));
     }
 
     @Test
@@ -60,7 +60,7 @@ class UserValidatorTest {
         user.setBirthday(LocalDate.MAX);
 
         assertThrows(ValidationException.class,
-                () -> UserValidator.validateUser(user, usersMap, RequestMethod.PUT));
+                () -> UserValidator.validateUser(user));
     }
 
     @Test
@@ -69,6 +69,6 @@ class UserValidatorTest {
         usersMap.put(2, user1);
 
         assertThrows(ValidationException.class,
-                () -> UserValidator.validateUser(user, usersMap, RequestMethod.PUT));
+                () -> UserValidator.validateUser(user1));
     }
 }
