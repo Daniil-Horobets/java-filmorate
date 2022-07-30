@@ -37,7 +37,7 @@ public class UserController {
     @GetMapping("/{id}")
     public User getUser(@PathVariable int id) {
         log.info("Request endpoint: 'GET /users/{}'", id);
-        return userService.get(id);
+        return userService.getById(id);
     }
 
     @PutMapping("/{id}/friends/{friendId}")

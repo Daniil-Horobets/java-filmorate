@@ -14,16 +14,14 @@ import java.util.stream.Collectors;
 public class UserService {
 
     @Autowired
-    InMemoryUserStorage inMemoryUserStorage;
+    private InMemoryUserStorage inMemoryUserStorage;
 
     public List<User> getAll() {
         return inMemoryUserStorage.getAll();
     }
 
-    public User get(int id) {
-        if (!inMemoryUserStorage.getUsers().containsKey(id)) {
-            throw new NotFoundException("User with id=" + id + " not found");
-        }
+    public User getById(int id) {
+        UserService.checkUserExistence(id, inMemoryUserStorage);
         return inMemoryUserStorage.get(id);
     }
 
@@ -36,9 +34,7 @@ public class UserService {
     }
 
     public User update(User user) {
-        if (!inMemoryUserStorage.getUsers().containsKey(user.getId())) {
-            throw new NotFoundException("User with id=" + user.getId() + " not found");
-        }
+        UserService.checkUserExistence(user.getId(), inMemoryUserStorage);
         UserValidator.validateUser(user);
         if (user.getName().isBlank()) {
             user.setName(user.getLogin());
@@ -47,33 +43,19 @@ public class UserService {
     }
 
     public void addFriend(int userId, int friendId) {
-        User user = inMemoryUserStorage.get(userId);
-        User friend = inMemoryUserStorage.get(friendId);
-        if (user == null) {
-            throw new NotFoundException("User with id=" + userId + " not found");
-        }
-        if (friend == null) {
-            throw new NotFoundException("User with id=" + friendId + " not found");
-        }
-        inMemoryUserStorage.addFriend(user, friend);
+        UserService.checkUserExistence(userId, inMemoryUserStorage);
+        UserService.checkUserExistence(friendId, inMemoryUserStorage);
+        inMemoryUserStorage.addFriend(inMemoryUserStorage.get(userId), inMemoryUserStorage.get(friendId));
     }
 
     public void deleteFriend(int userId, int friendId) {
-        User user = inMemoryUserStorage.get(userId);
-        User friend = inMemoryUserStorage.get(friendId);
-        if (user == null) {
-            throw new NotFoundException("User with id=" + userId + " not found");
-        }
-        if (friend == null) {
-            throw new NotFoundException("User with id=" + friendId + " not found");
-        }
-        inMemoryUserStorage.deleteFriend(user, friend);
+        UserService.checkUserExistence(userId, inMemoryUserStorage);
+        UserService.checkUserExistence(friendId, inMemoryUserStorage);
+        inMemoryUserStorage.deleteFriend(inMemoryUserStorage.get(userId), inMemoryUserStorage.get(friendId));
     }
 
     public List<User> getFriends(int id) {
-        if (!inMemoryUserStorage.getUsers().containsKey(id)) {
-            throw new NotFoundException("User with id=" + id + " not found");
-        }
+        UserService.checkUserExistence(id, inMemoryUserStorage);
         return inMemoryUserStorage.get(id).getFriendsIds()
                 .stream()
                 .map(inMemoryUserStorage::get)
@@ -81,16 +63,18 @@ public class UserService {
     }
 
     public List<User> getCommonFriends(int id, int otherId) {
-        if (!inMemoryUserStorage.getUsers().containsKey(id)) {
-            throw new NotFoundException("User with id=" + id + " not found");
-        }
-        if (!inMemoryUserStorage.getUsers().containsKey(otherId)) {
-            throw new NotFoundException("User with id=" + otherId + " not found");
-        }
+        UserService.checkUserExistence(id, inMemoryUserStorage);
+        UserService.checkUserExistence(otherId, inMemoryUserStorage);
         return getFriends(id)
                 .stream()
                 .distinct()
                 .filter(getFriends(otherId)::contains)
                 .collect((Collectors.toList()));
+    }
+
+    public static void checkUserExistence(int userId, InMemoryUserStorage inMemoryUserStorage) {
+        if (!inMemoryUserStorage.getUsers().containsKey(userId)) {
+            throw new NotFoundException("User with id=" + userId + " not found");
+        }
     }
 }

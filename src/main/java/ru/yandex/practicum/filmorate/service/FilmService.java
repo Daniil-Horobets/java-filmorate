@@ -17,19 +17,17 @@ import java.util.stream.Collectors;
 public class FilmService {
 
     @Autowired
-    InMemoryFilmStorage inMemoryFilmStorage;
+    private InMemoryFilmStorage inMemoryFilmStorage;
 
     @Autowired
-    InMemoryUserStorage inMemoryUserStorage;
+    private InMemoryUserStorage inMemoryUserStorage;
 
     public List<Film> getAll() {
         return inMemoryFilmStorage.getAll();
     }
 
-    public Film get(int id) {
-        if (!inMemoryFilmStorage.getFilms().containsKey(id)) {
-            throw new NotFoundException("Film with id=" + id + " not found");
-        }
+    public Film getById(int id) {
+        FilmService.checkFilmExistence(id, inMemoryFilmStorage);
         return inMemoryFilmStorage.get(id);
     }
 
@@ -39,35 +37,21 @@ public class FilmService {
     }
 
     public Film update(Film film) {
-        if (!inMemoryFilmStorage.getFilms().containsKey(film.getId())) {
-            throw new NotFoundException("Film with id=" + film.getId() + " not found");
-        }
+        FilmService.checkFilmExistence(film.getId(), inMemoryFilmStorage);
         FilmValidator.validateFilm(film);
         return inMemoryFilmStorage.update(film);
     }
 
     public void addLike(int userId, int filmId) {
-        User user = inMemoryUserStorage.get(userId);
-        Film film = inMemoryFilmStorage.get(filmId);
-        if (user == null) {
-            throw new NotFoundException("User with id=" + userId + " not found");
-        }
-        if (film == null) {
-            throw new NotFoundException("Film with id=" + filmId + " not found");
-        }
-        inMemoryFilmStorage.addLike(user, film);
+        UserService.checkUserExistence(userId, inMemoryUserStorage);
+        FilmService.checkFilmExistence(filmId, inMemoryFilmStorage);
+        inMemoryFilmStorage.addLike(inMemoryUserStorage.get(userId), inMemoryFilmStorage.get(filmId));
     }
 
     public void deleteLike(int userId, int filmId) {
-        User user = inMemoryUserStorage.get(userId);
-        Film film = inMemoryFilmStorage.get(filmId);
-        if (user == null) {
-            throw new NotFoundException("User with id=" + userId + " not found");
-        }
-        if (film == null) {
-            throw new NotFoundException("Film with id=" + filmId + " not found");
-        }
-        inMemoryFilmStorage.deleteLike(user, film);
+        UserService.checkUserExistence(userId, inMemoryUserStorage);
+        FilmService.checkFilmExistence(filmId, inMemoryFilmStorage);
+        inMemoryFilmStorage.deleteLike(inMemoryUserStorage.get(userId), inMemoryFilmStorage.get(filmId));
     }
 
     public List<Film> getMostLikedFilms(int count) {
@@ -76,5 +60,11 @@ public class FilmService {
                 .sorted(Comparator.comparingInt((Film film) -> film.getLikedUsersIds().size()).reversed())
                 .limit(count)
                 .collect(Collectors.toList());
+    }
+
+    public static void checkFilmExistence(int filmId, InMemoryFilmStorage inMemoryFilmStorage) {
+        if (!inMemoryFilmStorage.getFilms().containsKey(filmId)) {
+            throw new NotFoundException("Film with id=" + filmId + " not found");
+        }
     }
 }

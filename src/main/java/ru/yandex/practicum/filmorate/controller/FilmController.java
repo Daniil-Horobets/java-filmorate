@@ -37,7 +37,7 @@ public class FilmController {
     @GetMapping("/{id}")
     public Film getFilm(@PathVariable int id) {
         log.info("Request endpoint: 'GET /films/{}'", id);
-        return filmService.get(id);
+        return filmService.getById(id);
     }
 
     @PutMapping("/{id}/like/{userId}")
