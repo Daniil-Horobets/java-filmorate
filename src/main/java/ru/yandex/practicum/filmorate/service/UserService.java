@@ -21,7 +21,7 @@ public class UserService {
     }
 
     public User getById(int id) {
-        UserService.checkUserExistence(id, inMemoryUserStorage);
+        checkUserExistence(id, inMemoryUserStorage);
         return inMemoryUserStorage.get(id);
     }
 
@@ -34,7 +34,7 @@ public class UserService {
     }
 
     public User update(User user) {
-        UserService.checkUserExistence(user.getId(), inMemoryUserStorage);
+        checkUserExistence(user.getId(), inMemoryUserStorage);
         UserValidator.validateUser(user);
         if (user.getName().isBlank()) {
             user.setName(user.getLogin());
@@ -43,19 +43,19 @@ public class UserService {
     }
 
     public void addFriend(int userId, int friendId) {
-        UserService.checkUserExistence(userId, inMemoryUserStorage);
-        UserService.checkUserExistence(friendId, inMemoryUserStorage);
+        checkUserExistence(userId, inMemoryUserStorage);
+        checkUserExistence(friendId, inMemoryUserStorage);
         inMemoryUserStorage.addFriend(inMemoryUserStorage.get(userId), inMemoryUserStorage.get(friendId));
     }
 
     public void deleteFriend(int userId, int friendId) {
-        UserService.checkUserExistence(userId, inMemoryUserStorage);
-        UserService.checkUserExistence(friendId, inMemoryUserStorage);
+        checkUserExistence(userId, inMemoryUserStorage);
+        checkUserExistence(friendId, inMemoryUserStorage);
         inMemoryUserStorage.deleteFriend(inMemoryUserStorage.get(userId), inMemoryUserStorage.get(friendId));
     }
 
     public List<User> getFriends(int id) {
-        UserService.checkUserExistence(id, inMemoryUserStorage);
+        checkUserExistence(id, inMemoryUserStorage);
         return inMemoryUserStorage.get(id).getFriendsIds()
                 .stream()
                 .map(inMemoryUserStorage::get)
@@ -63,8 +63,8 @@ public class UserService {
     }
 
     public List<User> getCommonFriends(int id, int otherId) {
-        UserService.checkUserExistence(id, inMemoryUserStorage);
-        UserService.checkUserExistence(otherId, inMemoryUserStorage);
+        checkUserExistence(id, inMemoryUserStorage);
+        checkUserExistence(otherId, inMemoryUserStorage);
         return getFriends(id)
                 .stream()
                 .distinct()
@@ -72,7 +72,7 @@ public class UserService {
                 .collect((Collectors.toList()));
     }
 
-    public static void checkUserExistence(int userId, InMemoryUserStorage inMemoryUserStorage) {
+    public void checkUserExistence(int userId, InMemoryUserStorage inMemoryUserStorage) {
         if (!inMemoryUserStorage.getUsers().containsKey(userId)) {
             throw new NotFoundException("User with id=" + userId + " not found");
         }

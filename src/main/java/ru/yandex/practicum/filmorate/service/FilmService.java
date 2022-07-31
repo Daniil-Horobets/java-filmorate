@@ -4,7 +4,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.InMemoryFilmStorage;
 import ru.yandex.practicum.filmorate.storage.InMemoryUserStorage;
 import ru.yandex.practicum.filmorate.validator.FilmValidator;
@@ -22,12 +21,15 @@ public class FilmService {
     @Autowired
     private InMemoryUserStorage inMemoryUserStorage;
 
+    @Autowired
+    private UserService userService;
+
     public List<Film> getAll() {
         return inMemoryFilmStorage.getAll();
     }
 
     public Film getById(int id) {
-        FilmService.checkFilmExistence(id, inMemoryFilmStorage);
+        checkFilmExistence(id, inMemoryFilmStorage);
         return inMemoryFilmStorage.get(id);
     }
 
@@ -37,20 +39,20 @@ public class FilmService {
     }
 
     public Film update(Film film) {
-        FilmService.checkFilmExistence(film.getId(), inMemoryFilmStorage);
+        checkFilmExistence(film.getId(), inMemoryFilmStorage);
         FilmValidator.validateFilm(film);
         return inMemoryFilmStorage.update(film);
     }
 
     public void addLike(int userId, int filmId) {
-        UserService.checkUserExistence(userId, inMemoryUserStorage);
-        FilmService.checkFilmExistence(filmId, inMemoryFilmStorage);
+        userService.checkUserExistence(userId, inMemoryUserStorage);
+        checkFilmExistence(filmId, inMemoryFilmStorage);
         inMemoryFilmStorage.addLike(inMemoryUserStorage.get(userId), inMemoryFilmStorage.get(filmId));
     }
 
     public void deleteLike(int userId, int filmId) {
-        UserService.checkUserExistence(userId, inMemoryUserStorage);
-        FilmService.checkFilmExistence(filmId, inMemoryFilmStorage);
+        userService.checkUserExistence(userId, inMemoryUserStorage);
+        checkFilmExistence(filmId, inMemoryFilmStorage);
         inMemoryFilmStorage.deleteLike(inMemoryUserStorage.get(userId), inMemoryFilmStorage.get(filmId));
     }
 
@@ -62,7 +64,7 @@ public class FilmService {
                 .collect(Collectors.toList());
     }
 
-    public static void checkFilmExistence(int filmId, InMemoryFilmStorage inMemoryFilmStorage) {
+    public void checkFilmExistence(int filmId, InMemoryFilmStorage inMemoryFilmStorage) {
         if (!inMemoryFilmStorage.getFilms().containsKey(filmId)) {
             throw new NotFoundException("Film with id=" + filmId + " not found");
         }
