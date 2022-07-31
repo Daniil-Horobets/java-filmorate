@@ -1,12 +1,11 @@
 package ru.yandex.practicum.filmorate.controller;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.model.User;
-import ru.yandex.practicum.filmorate.validator.UserValidator;
+import ru.yandex.practicum.filmorate.service.UserService;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 @RestController
@@ -14,37 +13,54 @@ import java.util.List;
 @RequestMapping("/users")
 public class UserController {
 
-    private final HashMap<Integer, User> users = new HashMap<>();
-    private int idCounter = 0;
-    // Получение списка всех пользователей.
+    @Autowired
+    UserService userService;
+
     @GetMapping
     public List<User> findAll() {
         log.info("Request endpoint: 'GET /users'");
-        return new ArrayList<>(users.values());
+        return userService.getAll();
     }
 
-    // Создание пользователя
     @PostMapping
     public User create(@RequestBody User user) {
         log.info("Request endpoint: 'POST /users'");
-        UserValidator.validateUser(user, users, RequestMethod.POST);
-        if (user.getName().isBlank()) {
-            user.setName(user.getLogin());
-        }
-        user.setId(++idCounter);
-        users.put(idCounter, user);
-        return user;
+        return userService.create(user);
     }
 
-    // Обновление пользователя
     @PutMapping
     public User update(@RequestBody User user) {
         log.info("Request endpoint: 'PUT /users'");
-        UserValidator.validateUser(user, users, RequestMethod.PUT);
-        if (user.getName().isBlank()) {
-            user.setName(user.getLogin());
-        }
-        users.put(user.getId(), user);
-        return user;
+        return userService.update(user);
+    }
+
+    @GetMapping("/{id}")
+    public User getUser(@PathVariable int id) {
+        log.info("Request endpoint: 'GET /users/{}'", id);
+        return userService.getById(id);
+    }
+
+    @PutMapping("/{id}/friends/{friendId}")
+    public void addFriend(@PathVariable int id, @PathVariable int friendId) {
+        log.info("Request endpoint: 'PUT /users/{}/friends/{}'", id, friendId);
+        userService.addFriend(id, friendId);
+    }
+
+    @DeleteMapping("/{id}/friends/{friendId}")
+    public void deleteFriend(@PathVariable int id, @PathVariable int friendId) {
+        log.info("Request endpoint: 'DELETE /users/{}/friends/{}'", id, friendId);
+        userService.deleteFriend(id, friendId);
+    }
+
+    @GetMapping("/{id}/friends")
+    public List<User> getFriends(@PathVariable int id) {
+        log.info("Request endpoint: 'DELETE /users/{}/friends'", id);
+        return userService.getFriends(id);
+    }
+
+    @GetMapping("/{id}/friends/common/{otherId}")
+    public List<User> getCommonFriends(@PathVariable int id, @PathVariable int otherId) {
+        log.info("Request endpoint: 'DELETE /users/{}/friends/common/{}'", id, otherId);
+        return userService.getCommonFriends(id, otherId);
     }
 }
