@@ -7,6 +7,7 @@ import ru.yandex.practicum.filmorate.model.User;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Getter
 @Component
@@ -47,5 +48,13 @@ public class InMemoryUserStorage implements UserStorage {
     public void deleteFriend(User user, User friend) {
         user.getFriendsIds().remove(friend.getId());
         friend.getFriendsIds().remove(user.getId());
+    }
+
+    @Override
+    public List<User> getFriends(int id) {
+        return get(id).getFriendsIds()
+                .stream()
+                .map(this::get)
+                .collect((Collectors.toList()));
     }
 }

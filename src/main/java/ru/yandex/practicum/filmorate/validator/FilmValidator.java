@@ -25,5 +25,9 @@ public class FilmValidator {
             log.error("ValidationException: {}", "Film duration should be positive");
             throw new ValidationException("Film duration should be positive");
         }
+        if (film.getMpa() == null) {
+            log.error("ValidationException: {}", "Film MPA shouldn't not be blank");
+            throw new ValidationException("Film MPA shouldn't not be blank");
+        }
     }
 }
