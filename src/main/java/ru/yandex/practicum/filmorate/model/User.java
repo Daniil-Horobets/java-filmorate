@@ -11,6 +11,7 @@ import java.util.Set;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
+@EqualsAndHashCode(of = "id")
 public class User {
     private int id;
     private String email;
@@ -19,5 +20,5 @@ public class User {
     private LocalDate birthday;
 
     @JsonIgnore
-    Set<Integer> friendsIds = new HashSet<>();
+    private Set<Integer> friendsIds = new HashSet<>();
 }
