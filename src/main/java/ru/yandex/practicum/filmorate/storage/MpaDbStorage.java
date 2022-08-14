@@ -17,21 +17,24 @@ public class MpaDbStorage implements MpaStorage {
         this.jdbcTemplate = jdbcTemplate;
     }
 
-    private Mpa mapToMpa(ResultSet resultSet, int rowNum) throws SQLException {
-        return new Mpa(resultSet.getInt("MPA_ID"), resultSet.getString("MPA_NAME"));
-    }
-
     public List<Mpa> getAll() {
-        final String sqlQuery = "SELECT * FROM MPA ORDER BY MPA_ID";
+        final String sqlQuery = "SELECT * FROM mpa ORDER BY mpa_id";
         return jdbcTemplate.query(sqlQuery, this::mapToMpa);
     }
 
     public Mpa get(int id) {
-        final String sqlQuery = "SELECT * FROM MPA WHERE MPA_ID = ?";
+        final String sqlQuery = "SELECT * FROM mpa WHERE mpa_id = ?";
         List<Mpa> mpas = jdbcTemplate.query(sqlQuery, this::mapToMpa, id);
         if (mpas.size() != 1) {
             return null;
         }
         return mpas.get(0);
+    }
+
+    private Mpa mapToMpa(ResultSet resultSet, int rowNum) throws SQLException {
+        return new Mpa(
+                resultSet.getInt("mpa_id"),
+                resultSet.getString("mpa_name")
+        );
     }
 }

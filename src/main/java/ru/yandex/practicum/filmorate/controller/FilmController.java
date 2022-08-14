@@ -14,7 +14,7 @@ import java.util.List;
 public class FilmController {
 
     @Autowired
-    FilmService filmService;
+    private FilmService filmService;
 
     @GetMapping
     public List<Film> findAll() {

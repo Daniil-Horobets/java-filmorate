@@ -24,30 +24,19 @@ public class FilmDbStorage implements FilmStorage {
         this.genreDbStorage = genreDbStorage;
     }
 
-    private Film mapToFilm(ResultSet resultSet, int rowNum) throws SQLException {
-        Film film = new Film();
-        film.setId(resultSet.getInt("FILM_ID"));
-        film.setName(resultSet.getString("FILM_NAME"));
-        film.setDescription(resultSet.getString("FILM_DESCRIPTION"));
-        film.setReleaseDate(resultSet.getDate("FILM_RELEASE_DATE").toLocalDate());
-        film.setDuration(resultSet.getInt("FILM_DURATION"));
-        film.setMpa(new Mpa(resultSet.getInt("MPA_ID"), resultSet.getString("MPA_NAME")));
-        return film;
-    }
-
     @Override
     public List<Film> getAll() {
         final String sqlQuery =
-                "SELECT F.FILM_ID, " +
-                "F.FILM_NAME, " +
-                "F.FILM_DESCRIPTION, " +
-                "F.FILM_RELEASE_DATE, " +
-                "F.FILM_DURATION, " +
-                "M.MPA_ID, " +
-                "M.MPA_NAME " +
-                "FROM FILMS F " +
-                "JOIN MPA M " +
-                "ON F.FILM_MPA_ID = M.MPA_ID";
+                "SELECT f.film_id, " +
+                "f.film_name, " +
+                "f.film_description, " +
+                "f.film_release_date, " +
+                "f.film_duration, " +
+                "m.mpa_id, " +
+                "m.mpa_name " +
+                "FROM films f " +
+                "JOIN mpa m " +
+                "ON f.film_mpa_id = m.mpa_id";
         List<Film> films = jdbcTemplate.query(sqlQuery, this::mapToFilm);
         for (Film film : films) {
             genreDbStorage.loadFilmGenre(film);
@@ -59,17 +48,17 @@ public class FilmDbStorage implements FilmStorage {
     @Override
     public Film get(int id) {
         final String sqlQuery =
-                "SELECT F.FILM_ID, " +
-                "F.FILM_NAME, " +
-                "F.FILM_DESCRIPTION, " +
-                "F.FILM_RELEASE_DATE, " +
-                "F.FILM_DURATION, " +
-                "M.MPA_ID, " +
-                "M.MPA_NAME " +
-                "FROM FILMS F " +
-                "JOIN MPA M " +
-                "ON F.FILM_MPA_ID = M.MPA_ID " +
-                "WHERE F.FILM_ID = ?";
+                "SELECT f.film_id, " +
+                "f.film_name, " +
+                "f.film_description, " +
+                "f.film_release_date, " +
+                "f.film_duration, " +
+                "m.mpa_id, " +
+                "m.mpa_name " +
+                "FROM films f " +
+                "JOIN mpa m " +
+                "ON f.film_mpa_id = m.mpa_id " +
+                "WHERE f.film_id = ?";
         List<Film> films = jdbcTemplate.query(sqlQuery, this::mapToFilm, id);
         if (films.size() != 1) {
             return null;
@@ -83,12 +72,12 @@ public class FilmDbStorage implements FilmStorage {
     @Override
     public Film create(Film film) {
         final String sqlQuery =
-                "INSERT INTO FILMS(FILM_NAME, FILM_DESCRIPTION, FILM_RELEASE_DATE, FILM_DURATION, FILM_MPA_ID) " +
+                "INSERT INTO films(film_name, film_description, film_release_date, film_duration, film_mpa_id) " +
                 "VALUES (?, ?, ?, ?, ?);";
 
         KeyHolder keyHolder = new GeneratedKeyHolder();
         jdbcTemplate.update(connection -> {
-            PreparedStatement stmt = connection.prepareStatement(sqlQuery, new String[]{"FILM_ID"});
+            PreparedStatement stmt = connection.prepareStatement(sqlQuery, new String[]{"film_id"});
             stmt.setString(1, film.getName());
             stmt.setString(2, film.getDescription());
             final LocalDate releaseDate = film.getReleaseDate();
@@ -109,8 +98,8 @@ public class FilmDbStorage implements FilmStorage {
 
     @Override
     public Film update(Film film) {
-        final String sqlQuery = "UPDATE FILMS SET FILM_NAME = ?, FILM_DESCRIPTION = ?, FILM_RELEASE_DATE = ?, " +
-                "FILM_DURATION = ?, FILM_MPA_ID = ? WHERE FILM_ID = ?";
+        final String sqlQuery = "UPDATE films SET film_name = ?, film_description = ?, film_release_date = ?, " +
+                "film_duration = ?, film_mpa_id = ? WHERE film_id = ?";
         jdbcTemplate.update(sqlQuery
                 , film.getName()
                 , film.getDescription()
@@ -125,26 +114,37 @@ public class FilmDbStorage implements FilmStorage {
 
     @Override
     public void addLike(User user, Film film) {
-        final String sqlQuery = "INSERT INTO LIKES (FILM_ID, USER_ID) VALUES (?, ?)";
+        final String sqlQuery = "INSERT INTO likes (film_id, user_id) VALUES (?, ?)";
         jdbcTemplate.update(sqlQuery, film.getId(), user.getId());
         film.getLikedUsersIds().add(user.getId());
     }
 
     @Override
     public void deleteLike(User user, Film film) {
-        final String sqlQuery = "DELETE FROM LIKES WHERE FILM_ID = ? AND USER_ID = ?";
+        final String sqlQuery = "DELETE FROM likes WHERE film_id = ? AND user_id = ?";
         jdbcTemplate.update(sqlQuery, film.getId(), user.getId());
+    }
+
+    private Film mapToFilm(ResultSet resultSet, int rowNum) throws SQLException {
+        Film film = new Film();
+        film.setId(resultSet.getInt("film_id"));
+        film.setName(resultSet.getString("film_name"));
+        film.setDescription(resultSet.getString("film_description"));
+        film.setReleaseDate(resultSet.getDate("film_release_date").toLocalDate());
+        film.setDuration(resultSet.getInt("film_duration"));
+        film.setMpa(new Mpa(resultSet.getInt("mpa_id"), resultSet.getString("mpa_name")));
+        return film;
     }
 
     private void loadFilmLikes(Film film) {
         final String sqlQueryForLikes =
-                "SELECT USER_ID " +
-                        "FROM LIKES " +
-                        "WHERE FILM_ID =?";
+                "SELECT user_id " +
+                        "FROM likes " +
+                        "WHERE film_id =?";
         Set<Integer> likedUsersIds = new HashSet<>();
         List<Map<String, Object>> rows = jdbcTemplate.queryForList(sqlQueryForLikes, film.getId());
         for (Map<String, Object> row : rows) {
-            likedUsersIds.add((Integer) row.get("USER_ID"));
+            likedUsersIds.add((Integer) row.get("user_id"));
         }
         film.setLikedUsersIds(likedUsersIds);
     }

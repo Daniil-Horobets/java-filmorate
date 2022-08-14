@@ -22,5 +22,5 @@ public class Film {
     private Set<Genre> genres;
 
     @JsonIgnore
-    Set<Integer> likedUsersIds = new HashSet<>();
+    private Set<Integer> likedUsersIds = new HashSet<>();
 }

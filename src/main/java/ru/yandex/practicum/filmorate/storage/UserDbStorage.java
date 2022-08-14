@@ -19,25 +19,15 @@ public class UserDbStorage implements UserStorage {
         this.jdbcTemplate = jdbcTemplate;
     }
 
-    private User mapToUser(ResultSet resultSet, int rowNum) throws SQLException {
-        User user = new User();
-        user.setId(resultSet.getInt("USER_ID"));
-        user.setEmail(resultSet.getString("USER_EMAIL"));
-        user.setLogin(resultSet.getString("USER_LOGIN"));
-        user.setName(resultSet.getString("USER_NAME"));
-        user.setBirthday(resultSet.getDate("USER_BIRTHDAY").toLocalDate());
-        return user;
-    }
-
     @Override
     public List<User> getAll() {
-        final String sqlQuery = "SELECT * FROM USERS";
+        final String sqlQuery = "SELECT * FROM users";
         return jdbcTemplate.query(sqlQuery, this::mapToUser);
     }
 
     @Override
     public User get(int id) {
-        final String sqlQuery = "SELECT * FROM USERS WHERE USER_ID = ?";
+        final String sqlQuery = "SELECT * FROM users WHERE user_id = ?";
         List<User> users = jdbcTemplate.query(sqlQuery, this::mapToUser, id);
         if (users.size() != 1) {
             return null;
@@ -48,13 +38,13 @@ public class UserDbStorage implements UserStorage {
     @Override
     public User create(User user) {
         final String sqlQuery =
-                "INSERT INTO USERS(USER_EMAIL, USER_LOGIN, USER_NAME, USER_BIRTHDAY) " +
+                "INSERT INTO users(user_email, user_login, user_name, user_birthday) " +
                 "VALUES (?, ?, ?, ?)";
 
 
         KeyHolder keyHolder = new GeneratedKeyHolder();
         jdbcTemplate.update(connection -> {
-            PreparedStatement stmt = connection.prepareStatement(sqlQuery, new String[]{"USER_ID"});
+            PreparedStatement stmt = connection.prepareStatement(sqlQuery, new String[]{"user_id"});
             stmt.setString(1, user.getEmail());
             stmt.setString(2, user.getLogin());
             stmt.setString(3, user.getName());
@@ -72,8 +62,8 @@ public class UserDbStorage implements UserStorage {
 
     @Override
     public User update(User user) {
-        final String sqlQuery = "UPDATE USERS SET USER_EMAIL = ?, USER_LOGIN = ?, USER_NAME = ?, USER_BIRTHDAY = ?" +
-                " WHERE USER_ID = ?";
+        final String sqlQuery = "UPDATE users SET user_email = ?, user_login = ?, user_name = ?, user_birthday = ?" +
+                " WHERE user_id = ?";
         jdbcTemplate.update(sqlQuery
                 , user.getEmail()
                 , user.getLogin()
@@ -85,7 +75,7 @@ public class UserDbStorage implements UserStorage {
 
     @Override
     public void addFriend(User user, User friend) {
-        final String sqlQuery = "INSERT INTO FRIENDSHIP(USER_ID, USER_FRIEND_ID) VALUES (?, ?)";
+        final String sqlQuery = "INSERT INTO friendship(user_id, user_friend_id) VALUES (?, ?)";
         KeyHolder keyHolder = new GeneratedKeyHolder();
         jdbcTemplate.update(connection -> {
             PreparedStatement stmt = connection.prepareStatement(sqlQuery);
@@ -97,7 +87,7 @@ public class UserDbStorage implements UserStorage {
 
     @Override
     public void deleteFriend(User user, User friend) {
-        final String sqlQuery = "DELETE FROM FRIENDSHIP WHERE USER_ID = ? AND USER_FRIEND_ID = ?";
+        final String sqlQuery = "DELETE FROM friendship WHERE user_id = ? AND user_friend_id = ?";
         KeyHolder keyHolder = new GeneratedKeyHolder();
         jdbcTemplate.update(connection -> {
             PreparedStatement stmt = connection.prepareStatement(sqlQuery);
@@ -111,12 +101,21 @@ public class UserDbStorage implements UserStorage {
     public List<User> getFriends(int id) {
         final String sqlQuery =
                 "SELECT * " +
-                "FROM USERS U " +
-                "WHERE U.USER_ID " +
-                        "IN (SELECT F.USER_FRIEND_ID " +
-                            "FROM FRIENDSHIP F " +
-                            "WHERE F.USER_ID = ?)";
+                "FROM users u " +
+                "WHERE u.user_id " +
+                "IN (SELECT f.user_friend_id " +
+                    "FROM friendship f " +
+                    "WHERE f.user_id = ?)";
         return jdbcTemplate.query(sqlQuery, this::mapToUser, id);
+    }
 
+    private User mapToUser(ResultSet resultSet, int rowNum) throws SQLException {
+        User user = new User();
+        user.setId(resultSet.getInt("user_id"));
+        user.setEmail(resultSet.getString("user_email"));
+        user.setLogin(resultSet.getString("user_login"));
+        user.setName(resultSet.getString("user_name"));
+        user.setBirthday(resultSet.getDate("user_birthday").toLocalDate());
+        return user;
     }
 }

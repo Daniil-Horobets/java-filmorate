@@ -17,7 +17,7 @@ import java.util.List;
 public class MpaController {
 
     @Autowired
-    MpaService mpaService;
+    private MpaService mpaService;
 
     @GetMapping
     public List<Mpa> findAll() {

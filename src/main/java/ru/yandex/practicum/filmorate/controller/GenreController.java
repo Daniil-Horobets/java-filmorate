@@ -17,7 +17,7 @@ import java.util.List;
 public class GenreController {
 
     @Autowired
-    GenreService genreService;
+    private GenreService genreService;
 
     @GetMapping
     public List<Genre> findAll() {

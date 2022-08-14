@@ -8,6 +8,7 @@ import ru.yandex.practicum.filmorate.model.Genre;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Repository
 public class GenreDbStorage implements GenreStorage {
@@ -18,20 +19,15 @@ public class GenreDbStorage implements GenreStorage {
         this.jdbcTemplate = jdbcTemplate;
     }
 
-    private Genre mapToGenre(ResultSet resultSet, int rowNum) throws SQLException {
-        Genre genre = new Genre();
-        genre.setId(resultSet.getInt("GENRE_ID"));
-        genre.setName(resultSet.getString("GENRE_NAME"));
-        return genre;
-    }
-
+    @Override
     public List<Genre> getAll() {
-        final String sqlQuery = "SELECT * FROM GENRES ORDER BY GENRE_ID";
+        final String sqlQuery = "SELECT * FROM genres ORDER BY genre_id";
         return jdbcTemplate.query(sqlQuery, this::mapToGenre);
     }
 
+    @Override
     public Genre get(int id) {
-        final String sqlQuery = "SELECT * FROM GENRES WHERE GENRE_ID = ?";
+        final String sqlQuery = "SELECT * FROM genres WHERE genre_id = ?";
         List<Genre> genres = jdbcTemplate.query(sqlQuery, this::mapToGenre, id);
         if (genres.size() != 1) {
             return null;
@@ -44,33 +40,37 @@ public class GenreDbStorage implements GenreStorage {
         if (film.getGenres() == null) {
             return;
         }
-        final String sqlQueryDelete = "DELETE FROM GENRES_OF_FILMS WHERE FILM_ID = ?";
+        final String sqlQueryDelete = "DELETE FROM genres_of_films WHERE film_id = ?";
         jdbcTemplate.update(sqlQueryDelete, film.getId());
 
-        for (Genre genre : film.getGenres()) {
-            final String sqlQueryInsert = "INSERT INTO GENRES_OF_FILMS (GENRE_ID, FILM_ID) VALUES (?, ?)";
-            jdbcTemplate.update(sqlQueryInsert, genre.getId(), film.getId());
-        }
+        final String sqlQueryInsert = "INSERT INTO genres_of_films (genre_id, film_id) VALUES (?, ?)";
+        film.getGenres().forEach(genre -> jdbcTemplate.update(sqlQueryInsert, genre.getId(), film.getId()));
     }
 
     @Override
     public void loadFilmGenre(Film film) {
         final String sqlQuery =
-                "SELECT G.GENRE_ID, G.GENRE_NAME " +
-                "FROM GENRES_OF_FILMS GOF " +
-                "JOIN GENRES G ON GOF.GENRE_ID = G.GENRE_ID " +
-                "WHERE GOF.FILM_ID =?";
-        Set<Genre> genres = new HashSet<>();
-        List<Map<String, Object>> rows = jdbcTemplate.queryForList(sqlQuery, film.getId());
+                "SELECT g.genre_id, g.genre_name " +
+                "FROM genres_of_films gof " +
+                "JOIN genres g ON gof.genre_id = g.genre_id " +
+                "WHERE gof.film_id =?";
 
-        for (Map row : rows) {
-            Genre genre = new Genre();
+        film.setGenres(
+                jdbcTemplate.queryForList(sqlQuery, film.getId())
+                .stream()
+                .map(row -> new Genre(
+                        (Integer) row.get("genre_id"),
+                        (String) row.get("genre_name"))
+                )
+                .collect(Collectors.toSet())
+        );
+    }
 
-            genre.setId((Integer) row.get("GENRE_ID"));
-            genre.setName((String) row.get("GENRE_NAME"));
-            genres.add(genre);
-        }
-        film.setGenres(genres);
+    private Genre mapToGenre(ResultSet resultSet, int rowNum) throws SQLException {
+        Genre genre = new Genre();
+        genre.setId(resultSet.getInt("genre_id"));
+        genre.setName(resultSet.getString("genre_name"));
+        return genre;
     }
 
 }
