@@ -2,18 +2,15 @@ package ru.yandex.practicum.filmorate.validator;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.web.bind.annotation.RequestMethod;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
 
 import java.time.LocalDate;
-import java.util.HashMap;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 class UserValidatorTest {
 
-    private final HashMap<Integer, User> usersMap = new HashMap<>();
     private User user;
 
     @BeforeEach
@@ -23,7 +20,6 @@ class UserValidatorTest {
         user.setName("Name");
         user.setBirthday(LocalDate.now());
         user.setLogin("Login");
-        usersMap.put(1, user);
     }
 
     @Test
@@ -66,7 +62,6 @@ class UserValidatorTest {
     @Test
     void createEmptyUser() {
         User user1 = new User();
-        usersMap.put(2, user1);
 
         assertThrows(ValidationException.class,
                 () -> UserValidator.validateUser(user1));

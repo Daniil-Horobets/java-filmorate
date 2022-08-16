@@ -14,7 +14,7 @@ import java.util.List;
 public class UserController {
 
     @Autowired
-    UserService userService;
+    private UserService userService;
 
     @GetMapping
     public List<User> findAll() {
@@ -54,13 +54,13 @@ public class UserController {
 
     @GetMapping("/{id}/friends")
     public List<User> getFriends(@PathVariable int id) {
-        log.info("Request endpoint: 'DELETE /users/{}/friends'", id);
+        log.info("Request endpoint: 'GET /users/{}/friends'", id);
         return userService.getFriends(id);
     }
 
     @GetMapping("/{id}/friends/common/{otherId}")
     public List<User> getCommonFriends(@PathVariable int id, @PathVariable int otherId) {
-        log.info("Request endpoint: 'DELETE /users/{}/friends/common/{}'", id, otherId);
+        log.info("Request endpoint: 'GET /users/{}/friends/common/{}'", id, otherId);
         return userService.getCommonFriends(id, otherId);
     }
 }

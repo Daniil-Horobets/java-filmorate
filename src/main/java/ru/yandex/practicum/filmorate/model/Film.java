@@ -11,13 +11,16 @@ import java.util.Set;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
+@EqualsAndHashCode(of = "id")
 public class Film {
     private int id;
     private String name;
     private String description;
     private LocalDate releaseDate;
     private int duration;
+    private Mpa mpa;
+    private Set<Genre> genres;
 
     @JsonIgnore
-    Set<Integer> likedUsersIds = new HashSet<>();
+    private Set<Integer> likedUsersIds = new HashSet<>();
 }
