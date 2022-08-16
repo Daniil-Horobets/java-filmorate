@@ -10,7 +10,7 @@ import ru.yandex.practicum.filmorate.model.enums.Operation;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@EqualsAndHashCode(of = "id")
+@EqualsAndHashCode(of = "entityId")
 public class Event {
     Long eventId;
     int userId;
