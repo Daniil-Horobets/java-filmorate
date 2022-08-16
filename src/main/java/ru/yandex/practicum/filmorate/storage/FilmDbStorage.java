@@ -1,5 +1,6 @@
 package ru.yandex.practicum.filmorate.storage;
 
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
@@ -174,7 +175,7 @@ public class FilmDbStorage implements FilmStorage {
 
     @Override
     public void addLike(User user, Film film) {
-        final String sqlQuery = "INSERT INTO likes (film_id, user_id) VALUES (?, ?)";
+        final String sqlQuery = "MERGE INTO likes (film_id, user_id) VALUES (?, ?)";
         jdbcTemplate.update(sqlQuery, film.getId(), user.getId());
         film.getLikedUsersIds().add(user.getId());
     }
@@ -210,6 +211,31 @@ public class FilmDbStorage implements FilmStorage {
         }
 
         return directorFilms;
+    }
+
+    @Override
+    public List<Film> getRecommendations (Integer id) {
+        final String sqlQuery = "SELECT film_id FROM likes " +
+                                "WHERE user_id IN ( " +
+                                      "SELECT l.user_id FROM likes l " +
+                                      "WHERE l.film_id IN ( " +
+                                            "SELECT film_id FROM likes " +
+                                            "WHERE user_id = ? " +
+                                      ") AND user_id != ? " +
+                                      "GROUP BY l.user_id " +
+                                      "ORDER BY count(l.film_id) DESC " +
+                                      "LIMIT 1 " +
+                                      ") " +
+                                "AND film_id NOT IN ( " +
+                                        "SELECT film_id FROM likes " +
+                                        "WHERE user_id = ? " +
+                                ")";
+        List<Integer> recIds = jdbcTemplate.queryForList(sqlQuery, Integer.class, id, id, id);
+        List<Film> films = new ArrayList<>();
+        for (Integer recId : recIds) {
+            films.add(get(recId));
+        }
+        return films;
     }
 
     private Film mapToFilm(ResultSet resultSet, int rowNum) throws SQLException {
@@ -251,4 +277,14 @@ public class FilmDbStorage implements FilmStorage {
         return films;
     }
 
+    @Override
+    public boolean delete(int filmId) {
+        String sqlQuery = "DELETE FROM FILMS where FILM_ID = ?";
+
+        try {
+            return jdbcTemplate.update(sqlQuery, filmId) > 0;
+        } catch (EmptyResultDataAccessException e) {
+            return false;
+        }
+    }
 }

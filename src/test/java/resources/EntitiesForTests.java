@@ -1,9 +1,13 @@
 package resources;
 
+import ru.yandex.practicum.filmorate.model.Event;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Mpa;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.model.enums.EventType;
+import ru.yandex.practicum.filmorate.model.enums.Operation;
 
+import java.time.Instant;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -46,7 +50,13 @@ public class EntitiesForTests {
     public static User getTestUser() {
         return testUser;
     }
+
     public static User getTestFriend() {
         return testFriend;
+    }
+
+    public static Event getTestEvent() {
+        return new Event(1L,
+                2, Instant.now().toEpochMilli(), EventType.REVIEW, Operation.ADD, 2345);
     }
 }
