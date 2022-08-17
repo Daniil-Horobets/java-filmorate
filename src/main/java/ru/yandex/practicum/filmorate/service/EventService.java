@@ -9,16 +9,14 @@ import ru.yandex.practicum.filmorate.model.eventEnums.Operation;
 import ru.yandex.practicum.filmorate.storage.EventStorage;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
 
-import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.time.Instant;
 import java.util.List;
 
 @Service
 public class EventService {
     //TODO добавить методы к функциональности review
 
-    SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
     @Autowired
     private EventStorage eventStorage;
 
@@ -32,51 +30,50 @@ public class EventService {
         return eventStorage.getUserEvents(userId);
     }
 
-    public void removeLikeEvent(int userId, int filmId) {
-        createEvent(userId, EventType.LIKE, Operation.REMOVE, filmId);
+    public Event removeLikeEvent(int userId, int filmId) {
+        return createEvent(userId, EventType.LIKE, Operation.REMOVE, filmId);
     }
 
-    public void removeReviewEvent(int userId, int reviewId) {
-        createEvent(userId, EventType.REVIEW, Operation.REMOVE, reviewId);
+    public Event removeReviewEvent(int userId, int reviewId) {
+        return createEvent(userId, EventType.REVIEW, Operation.REMOVE, reviewId);
     }
 
-    public void removeFriendEvent(int userId, int friendId) {
-        createEvent(userId, EventType.REVIEW, Operation.REMOVE, friendId);
+    public Event removeFriendEvent(int userId, int friendId) {
+        return createEvent(userId, EventType.REVIEW, Operation.REMOVE, friendId);
     }
 
-    public void addLikeEvent(int userId, int filmId) {
-        createEvent(userId, EventType.LIKE, Operation.ADD, filmId);
+    public Event addLikeEvent(int userId, int filmId) {
+        return createEvent(userId, EventType.LIKE, Operation.ADD, filmId);
     }
 
-    public void addReviewEvent(int userId, int reviewId) {
-        createEvent(userId, EventType.REVIEW, Operation.ADD, reviewId);
+    public Event addReviewEvent(int userId, int reviewId) {
+        return createEvent(userId, EventType.REVIEW, Operation.ADD, reviewId);
     }
 
-    public void addFriendEvent(int userId, int friendId) {
-        createEvent(userId, EventType.FRIEND, Operation.ADD, friendId);
+    public Event addFriendEvent(int userId, int friendId) {
+        return createEvent(userId, EventType.FRIEND, Operation.ADD, friendId);
     }
 
-    public void updateLikeEvent(int userId, int filmId) {
-        createEvent(userId, EventType.LIKE, Operation.UPDATE, filmId);
+    public Event updateLikeEvent(int userId, int filmId) {
+        return createEvent(userId, EventType.LIKE, Operation.UPDATE, filmId);
     }
 
-    public void updateReviewEvent(int userId, int reviewId) {
-        createEvent(userId, EventType.REVIEW, Operation.UPDATE, reviewId);
+    public Event updateReviewEvent(int userId, int reviewId) {
+        return createEvent(userId, EventType.REVIEW, Operation.UPDATE, reviewId);
     }
 
-    public void updateReviewFriend(int userId, int friendId) {
-        createEvent(userId, EventType.FRIEND, Operation.UPDATE, friendId);
+    public Event updateReviewFriend(int userId, int friendId) {
+        return createEvent(userId, EventType.FRIEND, Operation.UPDATE, friendId);
     }
 
 
-    private void createEvent(int userId, EventType eventType, Operation operation, int entityId) {
+    private Event createEvent(int userId, EventType eventType, Operation operation, int entityId) {
         Event event = new Event();
-        Date date = new Date();
-        Timestamp timestamp = Timestamp.valueOf(formatter.format(date));
-        event.setTimestamp(timestamp);
+        event.setTimestamp((Instant.now().toEpochMilli()));
         event.setEventType(eventType);
         event.setOperation(operation);
         event.setUserId(userId);
         event.setEntityId(entityId);
+        return eventStorage.createEvent(event);
     }
 }

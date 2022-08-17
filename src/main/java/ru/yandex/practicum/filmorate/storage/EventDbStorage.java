@@ -24,7 +24,7 @@ public class EventDbStorage implements EventStorage {
     }
 
     @Override
-    public void createEvent(Event event) {
+    public Event createEvent(Event event) {
         final String sqlQuery =
                 "INSERT INTO events(" +
                         "event_timestamp, " +
@@ -36,7 +36,7 @@ public class EventDbStorage implements EventStorage {
         KeyHolder keyHolder = new GeneratedKeyHolder();
         jdbcTemplate.update(connection -> {
             PreparedStatement stmt = connection.prepareStatement(sqlQuery, new String[]{"event_id"});
-            stmt.setTimestamp(1, event.getTimestamp());
+            stmt.setLong(1, event.getTimestamp());
             stmt.setInt(2, event.getUserId());
             stmt.setString(3, event.getEventType().toString());
             stmt.setString(4, event.getOperation().toString());
@@ -44,6 +44,7 @@ public class EventDbStorage implements EventStorage {
             return stmt;
         }, keyHolder);
         event.setEventId(Objects.requireNonNull(keyHolder.getKey()).longValue());
+        return event;
     }
 
     @Override
@@ -57,14 +58,13 @@ public class EventDbStorage implements EventStorage {
                         "operation," +
                         "entity_id " +
                         "FROM events WHERE user_id = ?";
-        List<Event> events = jdbcTemplate.query(sqlQuery, this::mapToEvent, user_id);
-        return events;
+        return jdbcTemplate.query(sqlQuery, this::mapToEvent, user_id);
     }
 
     private Event mapToEvent(ResultSet resultSet, int rowNum) throws SQLException {
         Event event = new Event();
         event.setEventId(resultSet.getLong("event_id"));
-        event.setTimestamp(resultSet.getTimestamp("event_timestamp"));
+        event.setTimestamp(resultSet.getLong("event_timestamp"));
         event.setUserId(resultSet.getInt("user_id"));
         event.setEventType(EventType.valueOf(resultSet.getString("event_type")));
         event.setOperation(Operation.valueOf(resultSet.getString("operation")));

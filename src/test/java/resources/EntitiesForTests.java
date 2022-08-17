@@ -7,13 +7,13 @@ import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.model.eventEnums.EventType;
 import ru.yandex.practicum.filmorate.model.eventEnums.Operation;
 
-import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
+import java.time.Instant;
 import java.time.LocalDate;
-import java.util.Date;
 import java.util.HashSet;
 
-public class EntitiesForTests {    private static final Film testFilm = new Film(
+public class EntitiesForTests {
+    private static final Film testFilm = new Film(
             1,
             "Name",
             "Desc",
@@ -49,14 +49,13 @@ public class EntitiesForTests {    private static final Film testFilm = new Film
     public static User getTestUser() {
         return testUser;
     }
+
     public static User getTestFriend() {
         return testFriend;
     }
 
     public static Event getTestEvent() {
-        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
-        Event testEvent = new Event(1L,
-                2,Timestamp.valueOf(formatter.format(new Date())),EventType.REVIEW,Operation.ADD,2345);
-        return testEvent;
+        return new Event(1L,
+                2, Instant.now().toEpochMilli(), EventType.REVIEW, Operation.ADD, 2345);
     }
 }
