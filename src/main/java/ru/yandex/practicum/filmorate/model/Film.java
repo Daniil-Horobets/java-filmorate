@@ -4,7 +4,7 @@ import lombok.*;
 import net.minidev.json.annotate.JsonIgnore;
 
 import java.time.LocalDate;
-import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @Getter
@@ -20,7 +20,8 @@ public class Film {
     private int duration;
     private Mpa mpa;
     private Set<Genre> genres;
+    private List<Director> directors;
 
     @JsonIgnore
-    private Set<Integer> likedUsersIds = new HashSet<>();
+    private Set<Integer> likedUsersIds;
 }
