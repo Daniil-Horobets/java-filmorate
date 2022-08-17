@@ -86,4 +86,5 @@ public class UserService {
             throw new NotFoundException("User with id=" + userId + " not found");
         }
     }
+
 }
