@@ -3,7 +3,9 @@ package ru.yandex.practicum.filmorate.controller;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import ru.yandex.practicum.filmorate.model.Event;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.service.EventService;
 import ru.yandex.practicum.filmorate.service.UserService;
 
 import java.util.List;
@@ -15,6 +17,9 @@ public class UserController {
 
     @Autowired
     private UserService userService;
+
+    @Autowired
+    private EventService eventService;
 
     @GetMapping
     public List<User> findAll() {
@@ -62,5 +67,11 @@ public class UserController {
     public List<User> getCommonFriends(@PathVariable int id, @PathVariable int otherId) {
         log.info("Request endpoint: 'GET /users/{}/friends/common/{}'", id, otherId);
         return userService.getCommonFriends(id, otherId);
+    }
+
+    @GetMapping("/{id}/feed")
+    public List<Event> getUserEvents(@PathVariable int id) {
+        log.info("Request endpoint: 'GET /users/{}/feed'", id);
+        return eventService.getUserEvents(id);
     }
 }

@@ -27,6 +27,9 @@ public class FilmService {
     @Autowired
     private UserService userService;
 
+    @Autowired
+    private EventService eventService;
+
     public List<Film> getAll() {
         return filmStorage.getAll();
     }
@@ -51,12 +54,14 @@ public class FilmService {
         userService.checkUserExistence(userId, userStorage);
         checkFilmExistence(filmId, filmStorage);
         filmStorage.addLike(userStorage.get(userId), filmStorage.get(filmId));
+        eventService.addLikeEvent(userId, filmId);
     }
 
     public void deleteLike(int userId, int filmId) {
         userService.checkUserExistence(userId, userStorage);
         checkFilmExistence(filmId, filmStorage);
         filmStorage.deleteLike(userStorage.get(userId), filmStorage.get(filmId));
+        eventService.removeLikeEvent(userId, filmId);
     }
 
     public List<Film> getMostLikedFilms(int count) {
