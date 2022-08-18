@@ -150,6 +150,7 @@ public class FilmDbStorage implements FilmStorage {
         film.setLikedUsersIds(likedUsersIds);
     }
 
+    @Override
     public List<Film> getCommonFilms(int userId, int friendId){
         final String sqlQueryCommonFilms =
                 "SELECT film_id FROM likes WHERE (user_id = ? OR user_id =?) " +

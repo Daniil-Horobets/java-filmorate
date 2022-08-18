@@ -43,13 +43,13 @@ public class FilmController {
     }
 
     @PutMapping("/{id}/like/{userId}")
-    public void addLike (@PathVariable int id, @PathVariable int userId) {
+    public void addLike(@PathVariable int id, @PathVariable int userId) {
         log.info("Request endpoint: 'PUT /films/{}/like/{}'", id, userId);
         filmService.addLike(userId, id);
     }
 
     @DeleteMapping("/{id}/like/{userId}")
-    public void deleteLike (@PathVariable int id, @PathVariable int userId) {
+    public void deleteLike(@PathVariable int id, @PathVariable int userId) {
         log.info("Request endpoint: 'DELETE /films/{}/like/{}'", id, userId);
         filmService.deleteLike(userId, id);
     }
@@ -64,6 +64,7 @@ public class FilmController {
     public List<Film> getCommonFilms(@RequestParam int userId, @RequestParam int friendId) {
         log.info("Request endpoint: 'GET /common?userId={}&friendId={}'", userId, friendId);
         return filmService.getCommonFilms(userId, friendId);
+    }
 
     @DeleteMapping(value = "/{id}")
     public ResponseEntity<?> delete(@PathVariable(name = "id") int id) {
