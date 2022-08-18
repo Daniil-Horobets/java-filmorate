@@ -69,6 +69,7 @@ public class UserController {
     @DeleteMapping(value = "/{id}")
     public ResponseEntity<?> delete(@PathVariable(name = "id") int id) {
         final boolean deleted = userService.delete(id);
+        log.info("Request endpoint: 'DELETE /films/{}'", id);
 
         return deleted
                 ? new ResponseEntity<>(HttpStatus.OK)
