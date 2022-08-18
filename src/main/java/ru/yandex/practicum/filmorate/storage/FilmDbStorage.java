@@ -1,5 +1,6 @@
 package ru.yandex.practicum.filmorate.storage;
 
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
@@ -161,4 +162,14 @@ public class FilmDbStorage implements FilmStorage {
         return films;
     }
 
+    @Override
+    public boolean delete(int filmId) {
+        String sqlQuery = "DELETE FROM FILMS where FILM_ID = ?";
+
+        try {
+            return jdbcTemplate.update(sqlQuery, filmId) > 0;
+        } catch (EmptyResultDataAccessException e) {
+            return false;
+        }
+    }
 }
