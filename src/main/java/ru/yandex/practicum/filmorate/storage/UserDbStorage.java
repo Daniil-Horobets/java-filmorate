@@ -118,6 +118,8 @@ public class UserDbStorage implements UserStorage {
         } catch (EmptyResultDataAccessException e) {
             return false;
         }
+        String sqlQuery = "DELETE FROM USERS where USER_ID = ?";
+        return jdbcTemplate.update(sqlQuery, id) > 0;
     }
 
     private User mapToUser(ResultSet resultSet, int rowNum) throws SQLException {

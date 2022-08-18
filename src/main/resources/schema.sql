@@ -61,7 +61,6 @@ CREATE TABLE IF NOT EXISTS friendship
     CONSTRAINT friendship_pk PRIMARY key (user_id, user_friend_id),
     CONSTRAINT friendship_user_id_fk FOREIGN key (user_id) REFERENCES users ON DELETE CASCADE,
     CONSTRAINT friendship_user_friend_id_fk FOREIGN key (user_friend_id) REFERENCES users ON DELETE CASCADE
-);
 
 create table if not exists DIRECTORS
 (
