@@ -86,4 +86,8 @@ public class UserService {
             throw new NotFoundException("User with id=" + userId + " not found");
         }
     }
+
+    public boolean delete(int id) {
+        return userStorage.delete(id);
+    }
 }
