@@ -43,22 +43,44 @@ CREATE TABLE IF NOT EXISTS genres_of_films
     genre_id INTEGER NOT NULL,
     film_id  INTEGER NOT NULL,
     CONSTRAINT genres_of_films_pk PRIMARY key (genre_id, film_id),
-    CONSTRAINT genres_of_films_genre_id_fk FOREIGN key (genre_id) REFERENCES genres,
-    CONSTRAINT genres_of_films_film_id_fk FOREIGN key (film_id) REFERENCES films
+    CONSTRAINT genres_of_films_genre_id_fk FOREIGN key (genre_id) REFERENCES genres ON DELETE CASCADE,
+    CONSTRAINT genres_of_films_film_id_fk FOREIGN key (film_id) REFERENCES films ON DELETE CASCADE
 );
 CREATE TABLE IF NOT EXISTS likes
 (
     film_id INTEGER NOT NULL,
     user_id INTEGER NOT NULL,
     CONSTRAINT likes_pk PRIMARY key (film_id, user_id),
-    CONSTRAINT likes_film_id_fk FOREIGN key (film_id) REFERENCES films,
-    CONSTRAINT likes_user_id_fk FOREIGN key (user_id) REFERENCES users
+    CONSTRAINT likes_film_id_fk FOREIGN key (film_id) REFERENCES films ON DELETE CASCADE,
+    CONSTRAINT likes_user_id_fk FOREIGN key (user_id) REFERENCES users ON DELETE CASCADE
 );
 CREATE TABLE IF NOT EXISTS friendship
 (
     user_id        INTEGER NOT NULL,
     user_friend_id INTEGER NOT NULL,
     CONSTRAINT friendship_pk PRIMARY key (user_id, user_friend_id),
-    CONSTRAINT friendship_user_id_fk FOREIGN key (user_id) REFERENCES users,
-    CONSTRAINT friendship_user_friend_id_fk FOREIGN key (user_friend_id) REFERENCES users
+    CONSTRAINT friendship_user_id_fk FOREIGN key (user_id) REFERENCES users ON DELETE CASCADE,
+    CONSTRAINT friendship_user_friend_id_fk FOREIGN key (user_friend_id) REFERENCES users ON DELETE CASCADE
+);
+
+create table if not exists DIRECTORS
+(
+    DIRECTOR_ID   INTEGER auto_increment,
+    DIRECTOR_NAME CHARACTER VARYING(100) not null,
+    constraint DIRECTOR_ID
+        primary key (DIRECTOR_ID)
+);
+
+create table if not exists FILM_DIRECTORS
+(
+    FILM_ID  INTEGER not null,
+    DIRECTOR_ID INTEGER not null,
+    constraint FILM_DIRECTORS_PK
+        primary key (FILM_ID, DIRECTOR_ID),
+    constraint FOREIGN_KEY_FD_FILMS
+        foreign key (FILM_ID) references films
+            ON DELETE CASCADE,
+    constraint FOREIGN_KEY_FD_DIRECTORS
+        foreign key (DIRECTOR_ID) references DIRECTORS
+            ON DELETE CASCADE
 );

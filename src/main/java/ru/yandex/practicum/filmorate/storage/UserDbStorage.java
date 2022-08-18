@@ -1,5 +1,6 @@
 package ru.yandex.practicum.filmorate.storage;
 
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
@@ -107,6 +108,16 @@ public class UserDbStorage implements UserStorage {
                     "FROM friendship f " +
                     "WHERE f.user_id = ?)";
         return jdbcTemplate.query(sqlQuery, this::mapToUser, id);
+    }
+
+    @Override
+    public boolean delete(int id) {
+        try {
+        String sqlQuery = "DELETE FROM USERS where USER_ID = ?";
+        return jdbcTemplate.update(sqlQuery, id) > 0;
+        } catch (EmptyResultDataAccessException e) {
+            return false;
+        }
     }
 
     private User mapToUser(ResultSet resultSet, int rowNum) throws SQLException {
