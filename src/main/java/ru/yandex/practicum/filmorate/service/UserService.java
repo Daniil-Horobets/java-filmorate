@@ -87,4 +87,7 @@ public class UserService {
         }
     }
 
+    public boolean delete(int id) {
+        return userStorage.delete(id);
+    }
 }

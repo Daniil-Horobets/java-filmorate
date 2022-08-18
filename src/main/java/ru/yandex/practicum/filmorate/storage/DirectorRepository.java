@@ -100,7 +100,7 @@ public class DirectorRepository implements IDirectorRepository{
         String sqlQuery2 = "INSERT into FILM_DIRECTORS (FILM_ID, DIRECTOR_ID) " +
                 "values (?, ?)";
 
-            if (!film.getDirectors().isEmpty()) {
+        if (!film.getDirectors().isEmpty()) {
 
             for (Integer directorId : film.getDirectors().stream()
                     .map(Director::getId)

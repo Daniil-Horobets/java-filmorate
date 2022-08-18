@@ -1,5 +1,6 @@
 package ru.yandex.practicum.filmorate.storage;
 
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
@@ -30,15 +31,15 @@ public class FilmDbStorage implements FilmStorage {
     public List<Film> getAll() {
         final String sqlQuery =
                 "SELECT f.film_id, " +
-                "f.film_name, " +
-                "f.film_description, " +
-                "f.film_release_date, " +
-                "f.film_duration, " +
-                "m.mpa_id, " +
-                "m.mpa_name " +
-                "FROM films f " +
-                "JOIN mpa m " +
-                "ON f.film_mpa_id = m.mpa_id";
+                        "f.film_name, " +
+                        "f.film_description, " +
+                        "f.film_release_date, " +
+                        "f.film_duration, " +
+                        "m.mpa_id, " +
+                        "m.mpa_name " +
+                        "FROM films f " +
+                        "JOIN mpa m " +
+                        "ON f.film_mpa_id = m.mpa_id";
         List<Film> films = jdbcTemplate.query(sqlQuery, this::mapToFilm);
         for (Film film : films) {
             genreDbStorage.loadFilmGenre(film);
@@ -52,16 +53,16 @@ public class FilmDbStorage implements FilmStorage {
     public Film get(int id) {
         final String sqlQuery =
                 "SELECT f.film_id, " +
-                "f.film_name, " +
-                "f.film_description, " +
-                "f.film_release_date, " +
-                "f.film_duration, " +
-                "m.mpa_id, " +
-                "m.mpa_name " +
-                "FROM films f " +
-                "JOIN mpa m " +
-                "ON f.film_mpa_id = m.mpa_id " +
-                "WHERE f.film_id = ?";
+                        "f.film_name, " +
+                        "f.film_description, " +
+                        "f.film_release_date, " +
+                        "f.film_duration, " +
+                        "m.mpa_id, " +
+                        "m.mpa_name " +
+                        "FROM films f " +
+                        "JOIN mpa m " +
+                        "ON f.film_mpa_id = m.mpa_id " +
+                        "WHERE f.film_id = ?";
         List<Film> films = jdbcTemplate.query(sqlQuery, this::mapToFilm, id);
         if (films.size() != 1) {
             return null;
@@ -77,7 +78,7 @@ public class FilmDbStorage implements FilmStorage {
     public Film create(Film film) {
         final String sqlQuery =
                 "INSERT INTO films(film_name, film_description, film_release_date, film_duration, film_mpa_id) " +
-                "VALUES (?, ?, ?, ?, ?);";
+                        "VALUES (?, ?, ?, ?, ?);";
 
         KeyHolder keyHolder = new GeneratedKeyHolder();
         jdbcTemplate.update(connection -> {
@@ -186,4 +187,14 @@ public class FilmDbStorage implements FilmStorage {
         film.setLikedUsersIds(likedUsersIds);
     }
 
+    @Override
+    public boolean delete(int filmId) {
+        String sqlQuery = "DELETE FROM FILMS where FILM_ID = ?";
+
+        try {
+            return jdbcTemplate.update(sqlQuery, filmId) > 0;
+        } catch (EmptyResultDataAccessException e) {
+            return false;
+        }
+    }
 }

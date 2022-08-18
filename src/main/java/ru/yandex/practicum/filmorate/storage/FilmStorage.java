@@ -15,4 +15,5 @@ public interface FilmStorage {
 
     List<Film> readBestDirectorFilms(int directorId, String param);
 
+    boolean delete(int id);
 }

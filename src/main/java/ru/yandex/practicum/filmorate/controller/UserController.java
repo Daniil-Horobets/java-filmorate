@@ -66,4 +66,13 @@ public class UserController {
         return userService.getCommonFriends(id, otherId);
     }
 
+    @DeleteMapping(value = "/{id}")
+    public ResponseEntity<?> delete(@PathVariable(name = "id") int id) {
+        final boolean deleted = userService.delete(id);
+        log.info("Request endpoint: 'DELETE /films/{}'", id);
+
+        return deleted
+                ? new ResponseEntity<>(HttpStatus.OK)
+                : new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+    }
 }
