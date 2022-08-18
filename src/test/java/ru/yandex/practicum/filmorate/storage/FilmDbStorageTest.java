@@ -1,7 +1,10 @@
 package ru.yandex.practicum.filmorate.storage;
 
 import lombok.RequiredArgsConstructor;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.MethodOrderer;
+import org.junit.jupiter.api.Order;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestMethodOrder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -26,6 +29,7 @@ class FilmDbStorageTest {
     private final UserDbStorage userDbStorage;
     private final Film testFilm = EntitiesForTests.getTestFilm();
     private final User testUser = EntitiesForTests.getTestUser();
+    private final User testFriend = EntitiesForTests.getTestFriend();
 
     @Test
     @Order(1)
@@ -84,5 +88,20 @@ class FilmDbStorageTest {
         Film filmWithoutLike = filmDbStorage.get(testFilm.getId());
 
         assertTrue(filmWithoutLike.getLikedUsersIds().isEmpty());
+    }
+
+    @Test
+    public void testGetCommonFilms() {
+        filmDbStorage.create(testFilm);
+        testUser.setEmail("stu1@mail");
+        testUser.setLogin("stu2Login");
+        userDbStorage.create(testUser);
+        testFriend.setEmail("stu2@mail");
+        testFriend.setLogin("stu2@mail");
+        userDbStorage.create(testFriend);
+        filmDbStorage.addLike(testUser, testFilm);
+        filmDbStorage.addLike(testFriend, testFilm);
+        assertEquals(testFilm, filmDbStorage.getCommonFilms(testUser.getId(), testFriend.getId()).get(0),
+                "Выборка 'Общие фильмы' (из одного элемента)  не совпадает с исходной");
     }
 }
