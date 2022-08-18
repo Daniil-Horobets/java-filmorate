@@ -2,6 +2,8 @@ package ru.yandex.practicum.filmorate.controller;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.service.UserService;
@@ -63,4 +65,5 @@ public class UserController {
         log.info("Request endpoint: 'GET /users/{}/friends/common/{}'", id, otherId);
         return userService.getCommonFriends(id, otherId);
     }
+
 }

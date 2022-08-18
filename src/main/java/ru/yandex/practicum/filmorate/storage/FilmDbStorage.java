@@ -18,10 +18,12 @@ public class FilmDbStorage implements FilmStorage {
 
     private final JdbcTemplate jdbcTemplate;
     private final GenreDbStorage genreDbStorage;
+    private final DirectorRepository directorRepository;
 
-    public FilmDbStorage(JdbcTemplate jdbcTemplate, GenreDbStorage genreDbStorage) {
+    public FilmDbStorage(JdbcTemplate jdbcTemplate, GenreDbStorage genreDbStorage, DirectorRepository directorRepository) {
         this.jdbcTemplate = jdbcTemplate;
         this.genreDbStorage = genreDbStorage;
+        this.directorRepository = directorRepository;
     }
 
     @Override
@@ -41,6 +43,7 @@ public class FilmDbStorage implements FilmStorage {
         for (Film film : films) {
             genreDbStorage.loadFilmGenre(film);
             loadFilmLikes(film);
+            film.setDirectors(directorRepository.loadFilmDirectors(film.getId()));
         }
         return films;
     }
@@ -66,6 +69,7 @@ public class FilmDbStorage implements FilmStorage {
         Film film = films.get(0);
         genreDbStorage.loadFilmGenre(film);
         loadFilmLikes(film);
+        film.setDirectors(directorRepository.loadFilmDirectors(id));
         return film;
     }
 
@@ -93,6 +97,9 @@ public class FilmDbStorage implements FilmStorage {
         film.setId(Objects.requireNonNull(keyHolder.getKey()).intValue());
         genreDbStorage.setFilmGenre(film);
         genreDbStorage.loadFilmGenre(film);
+        directorRepository.setFilmDirectors(film);
+        film.setDirectors(directorRepository.loadFilmDirectors(film.getId()));
+
         return film;
     }
 
@@ -109,6 +116,9 @@ public class FilmDbStorage implements FilmStorage {
                 , film.getId());
         genreDbStorage.setFilmGenre(film);
         genreDbStorage.loadFilmGenre(film);
+        directorRepository.setFilmDirectors(film);
+        film.setDirectors(directorRepository.loadFilmDirectors(film.getId()));
+
         return film;
     }
 
@@ -123,6 +133,33 @@ public class FilmDbStorage implements FilmStorage {
     public void deleteLike(User user, Film film) {
         final String sqlQuery = "DELETE FROM likes WHERE film_id = ? AND user_id = ?";
         jdbcTemplate.update(sqlQuery, film.getId(), user.getId());
+    }
+    @Override
+    public List<Film> readBestDirectorFilms(int directorId, String param) {
+
+        if(directorRepository.read(directorId).isEmpty()) {
+            return null;
+        }
+
+        String sqlQuery;
+
+        if (param.equals("likes")) {
+            sqlQuery ="SELECT f.film_id, f.film_name, f.film_description, f.film_release_date, f.film_duration, m.mpa_id, m.mpa_name FROM films f JOIN MPA m ON f.FILM_MPA_ID = m.MPA_ID RIGHT JOIN FILM_DIRECTORS fd ON f.FILM_ID = fd.FILM_ID AND fd.DIRECTOR_ID=? LEFT JOIN LIKES fl ON f.FILM_ID = fl.FILM_ID GROUP BY f.FILM_ID ORDER BY COUNT(fl.FILM_ID) DESC";
+        } else if (param.equals("year")) {
+            sqlQuery ="SELECT f.film_id, f.film_name, f.film_description, f.film_release_date, f.film_duration, m.mpa_id, m.mpa_name FROM films f JOIN MPA m ON f.FILM_MPA_ID = m.MPA_ID RIGHT JOIN FILM_DIRECTORS fd ON f.FILM_ID = fd.FILM_ID AND fd.DIRECTOR_ID=? GROUP BY YEAR (f.FILM_RELEASE_DATE), MONTH(f.FILM_RELEASE_DATE), DAY_OF_MONTH(f.FILM_RELEASE_DATE)";
+        } else {
+            return null;
+        }
+
+        List<Film> directorFilms = jdbcTemplate.query(sqlQuery, this::mapToFilm, directorId);
+
+        for (Film film : directorFilms) {
+            genreDbStorage.loadFilmGenre(film);
+            loadFilmLikes(film);
+            film.setDirectors(directorRepository.loadFilmDirectors(film.getId()));
+        }
+
+        return directorFilms;
     }
 
     private Film mapToFilm(ResultSet resultSet, int rowNum) throws SQLException {
@@ -148,4 +185,5 @@ public class FilmDbStorage implements FilmStorage {
         }
         film.setLikedUsersIds(likedUsersIds);
     }
+
 }
