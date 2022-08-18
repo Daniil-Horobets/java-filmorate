@@ -103,6 +103,5 @@ class FilmDbStorageTest {
         filmDbStorage.addLike(testFriend, testFilm);
         assertEquals(testFilm, filmDbStorage.getCommonFilms(testUser.getId(), testFriend.getId()).get(0),
                 "Выборка 'Общие фильмы' (из одного элемента)  не совпадает с исходной");
-
     }
 }
