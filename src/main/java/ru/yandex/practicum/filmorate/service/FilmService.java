@@ -71,6 +71,12 @@ public class FilmService {
         return list;
     }
 
+    public List<Film> getCommonFilms(int userId, int friendId) {
+        userService.checkUserExistence(userId, userStorage);
+        userService.checkUserExistence(friendId, userStorage);
+        return filmStorage.getCommonFilms(userId, friendId);
+    }
+
     public void checkFilmExistence(int filmId, FilmStorage filmStorage) {
         Film filmToFind = new Film();
         filmToFind.setId(filmId);
