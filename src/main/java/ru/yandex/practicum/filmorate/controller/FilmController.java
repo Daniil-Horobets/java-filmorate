@@ -59,4 +59,14 @@ public class FilmController {
         log.info("Request endpoint: 'GET /films/popular?count={}'", count);
         return filmService.getMostLikedFilms(count);
     }
+
+    @DeleteMapping(value = "/{id}")
+    public ResponseEntity<?> delete(@PathVariable(name = "id") int id) {
+        final boolean deleted = filmService.delete(id);
+        log.info("Request endpoint: 'DELETE /films/{}'", id);
+        return deleted
+                ? new ResponseEntity<>(HttpStatus.OK)
+                : new ResponseEntity<>(HttpStatus.NOT_FOUND);
+
+    }
 }

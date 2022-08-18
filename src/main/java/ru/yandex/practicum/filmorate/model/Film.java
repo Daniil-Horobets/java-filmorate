@@ -4,14 +4,14 @@ import lombok.*;
 import net.minidev.json.annotate.JsonIgnore;
 
 import java.time.LocalDate;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
 @Getter
 @Setter
-@RequiredArgsConstructor
-//@NoArgsConstructor
 @AllArgsConstructor
+@RequiredArgsConstructor
 @EqualsAndHashCode(of = "id")
 public class Film {
     private int id;
@@ -22,7 +22,6 @@ public class Film {
     private Mpa mpa;
     private Set<Genre> genres;
     private List<Director> directors;
-
     @JsonIgnore
-    private Set<Integer> likedUsersIds;
+    private Set<Integer> likedUsersIds = new HashSet<>();
 }
