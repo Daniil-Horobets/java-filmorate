@@ -148,4 +148,17 @@ public class FilmDbStorage implements FilmStorage {
         }
         film.setLikedUsersIds(likedUsersIds);
     }
+
+    public List<Film> getCommonFilms(int userId, int friendId){
+        final String sqlQueryCommonFilms =
+                "SELECT film_id FROM likes WHERE (user_id = ? OR user_id =?) " +
+                        "GROUP BY film_id HAVING COUNT(film_id)=2";
+        List<Integer> ids = jdbcTemplate.queryForList(sqlQueryCommonFilms,Integer.class,userId,friendId);
+        List<Film> films = new ArrayList<>(Collections.emptyList());
+        for (int filmId : ids) {
+            films.add(get(filmId));
+        }
+        return films;
+    }
+
 }

@@ -57,4 +57,10 @@ public class FilmController {
         log.info("Request endpoint: 'GET /films/popular?count={}'", count);
         return filmService.getMostLikedFilms(count);
     }
+
+    @GetMapping("/common")
+    public List<Film> getCommonFilms(@RequestParam int userId, @RequestParam int friendId) {
+        log.info("Request endpoint: 'GET /common?userId={}&friendId={}'", userId, friendId);
+        return filmService.getCommonFilms(userId, friendId);
+    }
 }

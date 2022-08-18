@@ -71,6 +71,16 @@ public class FilmService {
         return list;
     }
 
+    public List<Film> getCommonFilms(int userId, int friendId) {
+        if (userService.getById(userId) == null) {
+            throw new NotFoundException("User with id=" + userId + " not found");
+        }
+        if (userService.getById(friendId) == null) {
+            throw new NotFoundException("User with id=" + friendId + " not found");
+        }
+        return filmStorage.getCommonFilms(userId, friendId);
+    }
+
     public void checkFilmExistence(int filmId, FilmStorage filmStorage) {
         Film filmToFind = new Film();
         filmToFind.setId(filmId);
