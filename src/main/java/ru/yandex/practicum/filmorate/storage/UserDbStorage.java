@@ -11,7 +11,7 @@ import java.sql.*;
 import java.time.LocalDate;
 import java.util.List;
 
-@Repository
+@Repository("userDbStorage")
 public class UserDbStorage implements UserStorage {
 
     private final JdbcTemplate jdbcTemplate;
