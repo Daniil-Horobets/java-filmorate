@@ -12,5 +12,8 @@ public interface FilmStorage {
     Film update(Film film);
     void addLike(User user, Film film);
     void deleteLike(User user, Film film);
+
+    List<Film> readBestDirectorFilms(int directorId, String param);
+
     boolean delete(int id);
 }
