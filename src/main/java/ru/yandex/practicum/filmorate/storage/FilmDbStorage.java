@@ -49,6 +49,57 @@ public class FilmDbStorage implements FilmStorage {
         return films;
     }
 
+    public List<Film> getFilmsByQuery (String query, List<String> by) {
+        if (by.size() == 1 && by.get(0).equals("title")) {
+            final String sqlQuery =
+                    "select * " +
+                            "from films f " +
+                            "join mpa m on f.film_mpa_id = m.mpa_id " +
+                            "where locate(lower(?), lower(f.film_name))";
+            List<Film> films = jdbcTemplate.query(sqlQuery, this::mapToFilm, query);
+            for (Film film : films) {
+                genreDbStorage.loadFilmGenre(film);
+                loadFilmLikes(film);
+                film.setDirectors(directorRepository.loadFilmDirectors(film.getId()));
+            }
+            return films;
+        }
+        if (by.size() == 1 && by.get(0).equals("director")) {
+            final String sqlQuery =
+                    "select * " +
+                            "from films f " +
+                            "join mpa m on f.film_mpa_id = m.mpa_id " +
+                            "left join FILM_DIRECTORS FD on f.FILM_ID = FD.FILM_ID " +
+                            "left join DIRECTORS D on D.DIRECTOR_ID = FD.DIRECTOR_ID " +
+                            "where locate(lower(?), lower(d.DIRECTOR_NAME))";
+            List<Film> films = jdbcTemplate.query(sqlQuery, this::mapToFilm, query);
+            for (Film film : films) {
+                genreDbStorage.loadFilmGenre(film);
+                loadFilmLikes(film);
+                film.setDirectors(directorRepository.loadFilmDirectors(film.getId()));
+            }
+            return films;
+        }
+        if ((by.size() == 2 && by.get(0).equals("title") && by.get(1).equals("director")) ||
+                ((by.size() == 2 && by.get(0).equals("director") && by.get(1).equals("title")))) {
+            final String sqlQuery =
+                    "select * " +
+                            "from films f " +
+                            "join mpa m on f.film_mpa_id = m.mpa_id " +
+                            "left join FILM_DIRECTORS FD on f.FILM_ID = FD.FILM_ID " +
+                            "left join DIRECTORS D on D.DIRECTOR_ID = FD.DIRECTOR_ID " +
+                            "where locate(lower(?), lower(d.DIRECTOR_NAME)) or locate(lower(?), lower(f.FILM_NAME))";
+            List<Film> films = jdbcTemplate.query(sqlQuery, this::mapToFilm, query, query);
+            for (Film film : films) {
+                genreDbStorage.loadFilmGenre(film);
+                loadFilmLikes(film);
+                film.setDirectors(directorRepository.loadFilmDirectors(film.getId()));
+            }
+            return films;
+        }
+        return null;
+    }
+
     @Override
     public Film get(int id) {
         final String sqlQuery =
