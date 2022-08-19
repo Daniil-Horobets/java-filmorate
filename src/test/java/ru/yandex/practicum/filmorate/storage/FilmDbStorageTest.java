@@ -20,13 +20,14 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 @AutoConfigureTestDatabase
-@RequiredArgsConstructor(onConstructor_ = @Autowired)
+//@RequiredArgsConstructor //(onConstructor_ = @Autowired)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @DirtiesContext(classMode= DirtiesContext.ClassMode.AFTER_CLASS)
 class FilmDbStorageTest {
-
-    private final FilmDbStorage filmDbStorage;
-    private final UserDbStorage userDbStorage;
+    @Autowired
+    FilmDbStorage filmDbStorage;
+    @Autowired
+    UserDbStorage userDbStorage;
     private final Film testFilm = EntitiesForTests.getTestFilm();
     private final User testUser = EntitiesForTests.getTestUser();
     private final User testFriend = EntitiesForTests.getTestFriend();
