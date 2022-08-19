@@ -9,12 +9,12 @@ import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Mpa;
 import ru.yandex.practicum.filmorate.model.User;
 
-import java.sql.*;
 import java.sql.Date;
+import java.sql.*;
 import java.time.LocalDate;
 import java.util.*;
 
-@Repository
+@Repository("filmDbStorage")
 public class FilmDbStorage implements FilmStorage {
 
     private final JdbcTemplate jdbcTemplate;
