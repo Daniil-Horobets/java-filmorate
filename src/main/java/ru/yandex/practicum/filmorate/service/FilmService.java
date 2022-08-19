@@ -109,4 +109,8 @@ public class FilmService {
             throw new NotFoundException("Film with id=" + filmId + " not found");
         }
     }
+
+    public boolean delete(int id) {
+        return filmStorage.delete(id);
+    }
 }
