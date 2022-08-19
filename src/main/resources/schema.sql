@@ -62,3 +62,25 @@ CREATE TABLE IF NOT EXISTS friendship
     CONSTRAINT friendship_user_id_fk FOREIGN key (user_id) REFERENCES users ON DELETE CASCADE,
     CONSTRAINT friendship_user_friend_id_fk FOREIGN key (user_friend_id) REFERENCES users ON DELETE CASCADE
 );
+
+create table if not exists DIRECTORS
+(
+    DIRECTOR_ID   INTEGER auto_increment,
+    DIRECTOR_NAME CHARACTER VARYING(100) not null,
+    constraint DIRECTOR_ID
+        primary key (DIRECTOR_ID)
+);
+
+create table if not exists FILM_DIRECTORS
+(
+    FILM_ID  INTEGER not null,
+    DIRECTOR_ID INTEGER not null,
+    constraint FILM_DIRECTORS_PK
+        primary key (FILM_ID, DIRECTOR_ID),
+    constraint FOREIGN_KEY_FD_FILMS
+        foreign key (FILM_ID) references films
+            ON DELETE CASCADE,
+    constraint FOREIGN_KEY_FD_DIRECTORS
+        foreign key (DIRECTOR_ID) references DIRECTORS
+            ON DELETE CASCADE
+);
