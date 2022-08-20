@@ -11,8 +11,6 @@ public interface ReviewStorage {
     Review create(Review review);
     Review update(Review review);
     void delete(int reviewId);
-    void addLike(int reviewId, int userId);
-    void addDislike(int reviewId, int userId);
-    void deleteLike(int reviewId, int userId);
-    void deleteDislike(int reviewId, int userId);
+    void addReactionAssessment(int reviewId, int userId, boolean isLike);
+    void deleteReactionAssessment(int reviewId, int userId, boolean isLike);
 }

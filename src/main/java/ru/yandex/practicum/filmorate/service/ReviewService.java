@@ -4,14 +4,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
-import ru.yandex.practicum.filmorate.exception.NotUniqueReactionException;
+import ru.yandex.practicum.filmorate.exception.AlreadyExistsException;
 import ru.yandex.practicum.filmorate.model.Review;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.ReviewStorage;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 public class ReviewService {
@@ -68,32 +67,18 @@ public class ReviewService {
         return reviews;
     }
 
-    public void addLike(int reviewId, int userId) {
+    public void addReactionAssessment(int reviewId, int userId, boolean isLike) {
         checkReviewExistence(reviewId);
         userService.checkUserExistence(userId, userStorage);
         checkReactionUserIdUnique(reviewId, userId);
-        reviewStorage.addLike(reviewId,userId);
+        reviewStorage.addReactionAssessment(reviewId, userId, isLike);
     }
 
-    public void deleteLike(int reviewId, int userId){
+    public void deleteReactionAssessment(int reviewId, int userId, boolean isLike) {
         checkReviewExistence(reviewId);
         userService.checkUserExistence(userId, userStorage);
-        checkLikeUserIdPresent(reviewId, userId);
-        reviewStorage.deleteLike(reviewId,userId);
-    }
-
-    public void addDislike(int reviewId, int userId){
-        checkReviewExistence(reviewId);
-        userService.checkUserExistence(userId, userStorage);
-        checkReactionUserIdUnique(reviewId, userId);
-        reviewStorage.addDislike(reviewId,userId);
-    }
-
-    public void deleteDislike(int reviewId, int userId){
-        checkReviewExistence(reviewId);
-        userService.checkUserExistence(userId, userStorage);
-        checkDislikeUserIdPresent(reviewId, userId);
-        reviewStorage.deleteDislike(reviewId,userId);
+        checkReactionUserIdPresent(reviewId, userId, isLike);
+        reviewStorage.deleteReactionAssessment(reviewId, userId, isLike);
     }
 
     public void checkReviewExistence(int reviewId) {
@@ -103,24 +88,23 @@ public class ReviewService {
     public void checkReactionUserIdUnique(int reviewId, int userId){
         Review review = getById(reviewId);
         if (review.getLikedUsersIds().contains(userId) || review.getDislikedUsersIds().contains(userId)) {
-            throw new NotUniqueReactionException("User with id=" + userId
+            throw new AlreadyExistsException("User with id=" + userId
                     + " has already added reaction to review with id=" + reviewId);
         }
     }
 
-    public void checkLikeUserIdPresent(int reviewId, int userId){
+    public void checkReactionUserIdPresent(int reviewId, int userId, boolean isLike){
         Review review = getById(reviewId);
-        if (!review.getLikedUsersIds().contains(userId)) {
-            throw new NotFoundException("User with id=" + userId
-                    + " didn't add like to review with id=" + reviewId);
-        }
-    }
-
-    public void checkDislikeUserIdPresent(int reviewId, int userId){
-        Review review = getById(reviewId);
-        if (!review.getDislikedUsersIds().contains(userId)) {
-            throw new NotFoundException("User with id=" + userId
-                    + " didn't add like to review with id=" + reviewId);
+        if (isLike) {
+            if (!review.getLikedUsersIds().contains(userId)) {
+                throw new NotFoundException("User with id=" + userId
+                        + " didn't add like to review with id=" + reviewId);
+            }
+        } else {
+            if (!review.getDislikedUsersIds().contains(userId)) {
+                throw new NotFoundException("User with id=" + userId
+                        + " didn't add dislike to review with id=" + reviewId);
+            }
         }
     }
 }

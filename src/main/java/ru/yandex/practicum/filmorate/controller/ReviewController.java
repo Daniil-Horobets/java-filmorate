@@ -49,24 +49,24 @@ public class ReviewController {
     @PutMapping("/{id}/like/{userId}")
     public void addLike(@PathVariable int id, @PathVariable int userId) {
         log.info("Request endpoint: 'PUT /reviews/{}/like/{}'", id, userId);
-        reviewService.addLike(id, userId);
+        reviewService.addReactionAssessment(id, userId, true);
     }
 
     @DeleteMapping("/{id}/like/{userId}")
     public void deleteLike(@PathVariable int id, @PathVariable int userId) {
         log.info("Request endpoint: 'DELETE /reviews/{}/like/{}'", id, userId);
-        reviewService.deleteLike(id, userId);
+        reviewService.deleteReactionAssessment(id, userId, true);
     }
 
     @PutMapping("/{id}/dislike/{userId}")
     public void addDislike(@PathVariable int id, @PathVariable int userId) {
         log.info("Request endpoint: 'PUT /reviews/{}/dislike/{}'", id, userId);
-        reviewService.addDislike(id, userId);
+        reviewService.addReactionAssessment(id, userId, false);
     }
 
     @DeleteMapping("/{id}/dislike/{userId}")
     public void deleteDislike(@PathVariable int id, @PathVariable int userId) {
         log.info("Request endpoint: 'DELETE /reviews/{}/dislike/{}'", id, userId);
-        reviewService.deleteDislike(id, userId);
+        reviewService.deleteReactionAssessment(id, userId, false);
     }
 }

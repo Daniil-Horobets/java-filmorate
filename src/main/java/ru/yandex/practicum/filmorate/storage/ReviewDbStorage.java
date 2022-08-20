@@ -4,7 +4,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.model.Review;
-import ru.yandex.practicum.filmorate.model.ReviewReaction;
+import ru.yandex.practicum.filmorate.model.enums.ReviewReaction;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -84,40 +84,34 @@ public class ReviewDbStorage implements ReviewStorage{
     }
 
     @Override
-    public void addLike(int reviewId, int userId) {
+    public void addReactionAssessment(int reviewId, int userId, boolean isLike) {
         final String sqlQuery = "INSERT INTO reviews_reactions (review_id, user_id, reaction_name) " +
                 "VALUES (?,?,?)";
-        jdbcTemplate.update(sqlQuery, reviewId, userId, ReviewReaction.LIKE.toString().toLowerCase());
-        final String sqlUpdate = "UPDATE reviews SET review_usefulness = review_usefulness+1 " +
-                "WHERE review_id = ?";
+        String sqlUpdate;
+        if (isLike) {
+            jdbcTemplate.update(sqlQuery, reviewId, userId, ReviewReaction.LIKE.toString().toLowerCase());
+            sqlUpdate = "UPDATE reviews SET review_usefulness = review_usefulness+1 " +
+                    "WHERE review_id = ?";
+        } else {
+            jdbcTemplate.update(sqlQuery, reviewId, userId, ReviewReaction.DISLIKE.toString().toLowerCase());
+            sqlUpdate = "UPDATE reviews SET review_usefulness = review_usefulness-1 " +
+                    "WHERE review_id = ?";
+        }
         jdbcTemplate.update(sqlUpdate, reviewId);
     }
 
     @Override
-    public void addDislike(int reviewId, int userId) {
-        final String sqlQuery = "INSERT INTO reviews_reactions (review_id, user_id, reaction_name) " +
-                "VALUES (?,?,?)";
-        jdbcTemplate.update(sqlQuery, reviewId, userId, ReviewReaction.DISLIKE.toString().toLowerCase());
-        final String sqlUpdate = "UPDATE reviews SET review_usefulness = review_usefulness-1 " +
-                "WHERE review_id = ?";
-        jdbcTemplate.update(sqlUpdate, reviewId);
-    }
-
-    @Override
-    public void deleteLike(int reviewId, int userId) {
+    public void deleteReactionAssessment(int reviewId, int userId, boolean isLike) {
         final String sqlQuery = "DELETE FROM reviews_reactions WHERE review_id = ? AND user_id = ?";
         jdbcTemplate.update(sqlQuery, reviewId, userId);
-        final String sqlUpdate = "UPDATE reviews SET review_usefulness = review_usefulness-1 " +
-                "WHERE review_id = ?";
-        jdbcTemplate.update(sqlUpdate, reviewId);
-    }
-
-    @Override
-    public void deleteDislike(int reviewId, int userId) {
-        final String sqlQuery = "DELETE FROM reviews_reactions WHERE review_id = ? AND user_id = ?";
-        jdbcTemplate.update(sqlQuery, reviewId, userId);
-        final String sqlUpdate = "UPDATE reviews SET review_usefulness = review_usefulness+1 " +
-                "WHERE review_id = ?";
+        String sqlUpdate;
+        if (isLike) {
+            sqlUpdate = "UPDATE reviews SET review_usefulness = review_usefulness-1 " +
+                    "WHERE review_id = ?";
+        } else {
+            sqlUpdate = "UPDATE reviews SET review_usefulness = review_usefulness+1 " +
+                    "WHERE review_id = ?";
+        }
         jdbcTemplate.update(sqlUpdate, reviewId);
     }
 
