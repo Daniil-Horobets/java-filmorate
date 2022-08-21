@@ -32,19 +32,28 @@ public class ReviewService {
     @Autowired
     private UserService userService;
 
+    @Autowired
+    private EventService eventService;
+
     public Review create(Review review){
         filmService.checkFilmExistence(review.getFilmId(), filmStorage);
         userService.checkUserExistence(review.getUserId(), userStorage);
-        return reviewStorage.create(review);
+        review = reviewStorage.create(review);
+        eventService.addReviewEvent(review.getUserId(),review.getReviewId());
+        return review;
     }
 
     public Review update(Review review){
         checkReviewExistence(review.getReviewId());
-        return reviewStorage.update(review);
+        review = reviewStorage.update(review);
+        eventService.updateReviewEvent(review.getUserId(),review.getReviewId());
+        return review;
+
     }
 
     public void delete(int reviewId){
         checkReviewExistence(reviewId);
+        eventService.removeReviewEvent(getById(reviewId).getUserId(),reviewId);
         reviewStorage.delete(reviewId);
     }
 

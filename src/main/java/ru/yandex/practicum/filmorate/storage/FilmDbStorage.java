@@ -213,6 +213,31 @@ public class FilmDbStorage implements FilmStorage {
         return directorFilms;
     }
 
+    @Override
+    public List<Film> getRecommendations (Integer id) {
+        final String sqlQuery = "SELECT film_id FROM likes " +
+                                "WHERE user_id IN ( " +
+                                      "SELECT l.user_id FROM likes l " +
+                                      "WHERE l.film_id IN ( " +
+                                            "SELECT film_id FROM likes " +
+                                            "WHERE user_id = ? " +
+                                      ") AND user_id != ? " +
+                                      "GROUP BY l.user_id " +
+                                      "ORDER BY count(l.film_id) DESC " +
+                                      "LIMIT 1 " +
+                                      ") " +
+                                "AND film_id NOT IN ( " +
+                                        "SELECT film_id FROM likes " +
+                                        "WHERE user_id = ? " +
+                                ")";
+        List<Integer> recIds = jdbcTemplate.queryForList(sqlQuery, Integer.class, id, id, id);
+        List<Film> films = new ArrayList<>();
+        for (Integer recId : recIds) {
+            films.add(get(recId));
+        }
+        return films;
+    }
+
     private Film mapToFilm(ResultSet resultSet, int rowNum) throws SQLException {
         Film film = new Film();
         film.setId(resultSet.getInt("film_id"));
