@@ -1,7 +1,10 @@
 package ru.yandex.practicum.filmorate.storage;
 
 import lombok.RequiredArgsConstructor;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.MethodOrderer;
+import org.junit.jupiter.api.Order;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestMethodOrder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -17,13 +20,14 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 @AutoConfigureTestDatabase
-@RequiredArgsConstructor(onConstructor_ = @Autowired)
+//@RequiredArgsConstructor //(onConstructor_ = @Autowired)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @DirtiesContext(classMode= DirtiesContext.ClassMode.AFTER_CLASS)
 class FilmDbStorageTest {
-
-    private final FilmDbStorage filmDbStorage;
-    private final UserDbStorage userDbStorage;
+    @Autowired
+    FilmDbStorage filmDbStorage;
+    @Autowired
+    UserDbStorage userDbStorage;
     private final Film testFilm = EntitiesForTests.getTestFilm();
     private final User testUser = EntitiesForTests.getTestUser();
 

@@ -2,6 +2,8 @@ package ru.yandex.practicum.filmorate.controller;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.service.FilmService;
@@ -53,8 +55,21 @@ public class FilmController {
     }
 
     @GetMapping("/popular")
-    public List<Film> getMostLikedFilms(@RequestParam(defaultValue = "10") int count) {
-        log.info("Request endpoint: 'GET /films/popular?count={}'", count);
-        return filmService.getMostLikedFilms(count);
+    public List<Film> getMostLikedFilms(
+            @RequestParam(defaultValue = "10", name = "count") Integer count,
+            @RequestParam(required = false, name = "genreId") Integer genreId,
+            @RequestParam(required = false, name = "year") Integer year) {
+        log.info("Request endpoint: 'GET /films/popular?count={}&genreId={}&year={}'", count, genreId, year);
+        return filmService.getMostLikedFilms(count, genreId, year);
+    }
+
+    @DeleteMapping(value = "/{id}")
+    public ResponseEntity<?> delete(@PathVariable(name = "id") int id) {
+        final boolean deleted = filmService.delete(id);
+        log.info("Request endpoint: 'DELETE /films/{}'", id);
+        return deleted
+                ? new ResponseEntity<>(HttpStatus.OK)
+                : new ResponseEntity<>(HttpStatus.NOT_FOUND);
+
     }
 }
