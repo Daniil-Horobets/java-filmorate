@@ -240,8 +240,10 @@ public class FilmDbStorage implements FilmStorage {
     @Override
     public List<Film> getCommonFilms(int userId, int friendId){
         final String sqlQueryCommonFilms =
-                "SELECT film_id FROM likes WHERE (user_id = ? OR user_id =?) " +
-                        "GROUP BY film_id HAVING COUNT(film_id)=2";
+                "select FILM_ID from" +
+                        " (select FILM_ID, count(USER_ID) c from LIKES where FILM_ID in " +
+                        "(select FILM_ID from LIKES where USER_ID = ? intersect " +
+                        "select FILM_ID from LIKES where USER_ID = ?) group by FILM_ID order by c desc)";
         List<Integer> ids = jdbcTemplate.queryForList(sqlQueryCommonFilms,Integer.class,userId,friendId);
         List<Film> films = new ArrayList<>(Collections.emptyList());
         for (int filmId : ids) {
