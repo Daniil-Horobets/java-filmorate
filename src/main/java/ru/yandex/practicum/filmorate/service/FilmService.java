@@ -40,6 +40,12 @@ public class FilmService {
         return filmStorage.get(id);
     }
 
+    public List<Film> getFilmsByQuery(String query, List<String> by) {
+        List<Film> films = new ArrayList<>(filmStorage.getFilmsByQuery(query, by));
+        films.sort(Comparator.comparingInt((Film film) -> film.getLikedUsersIds().size()).reversed());
+        return films;
+    }
+
     public Film create(Film film) {
         FilmValidator.validateFilm(film);
         return filmStorage.create(film);

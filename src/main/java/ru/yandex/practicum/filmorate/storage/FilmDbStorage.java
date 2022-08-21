@@ -49,6 +49,56 @@ public class FilmDbStorage implements FilmStorage {
         return films;
     }
 
+    public List<Film> getFilmsByQuery (String query, List<String> by) {
+        if (by.size() == 1 && by.get(0).equals("title")) {
+            final String sqlQuery =
+                    "SELECT * " +
+                            "FROM films f " +
+                            "JOIN mpa m ON f.film_mpa_id = m.mpa_id " +
+                            "where locate(lower(?), lower(f.film_name))";
+            List<Film> films = jdbcTemplate.query(sqlQuery, this::mapToFilm, query);
+            for (Film film : films) {
+                genreDbStorage.loadFilmGenre(film);
+                loadFilmLikes(film);
+                film.setDirectors(directorRepository.loadFilmDirectors(film.getId()));
+            }
+            return films;
+        }
+        if (by.size() == 1 && by.get(0).equals("director")) {
+            final String sqlQuery =
+                    "SELECT * " +
+                            "FROM films f " +
+                            "JOIN mpa m ON f.film_mpa_id = m.mpa_id " +
+                            "LEFT JOIN film_directors fd on f.film_id = fd.film_id " +
+                            "LEFT JOIN directors d ON d.director_id = fd.director_id " +
+                            "WHERE locate(lower(?), lower(d.director_name))";
+            List<Film> films = jdbcTemplate.query(sqlQuery, this::mapToFilm, query);
+            for (Film film : films) {
+                genreDbStorage.loadFilmGenre(film);
+                loadFilmLikes(film);
+                film.setDirectors(directorRepository.loadFilmDirectors(film.getId()));
+            }
+            return films;
+        }
+        if (by.containsAll((List.of("title", "director")))) {
+            final String sqlQuery =
+                    "SELECT * " +
+                            "FROM films f " +
+                            "JOIN mpa m ON f.film_mpa_id = m.mpa_id " +
+                            "LEFT JOIN film_directors fd on f.film_id = fd.film_id " +
+                            "LEFT JOIN directors d ON d.director_id = fd.director_id " +
+                            "WHERE locate(lower(?), lower(d.director_name)) or locate(lower(?), lower(f.film_name))";
+            List<Film> films = jdbcTemplate.query(sqlQuery, this::mapToFilm, query, query);
+            for (Film film : films) {
+                genreDbStorage.loadFilmGenre(film);
+                loadFilmLikes(film);
+                film.setDirectors(directorRepository.loadFilmDirectors(film.getId()));
+            }
+            return films;
+        }
+        return null;
+    }
+
     @Override
     public Film get(int id) {
         final String sqlQuery =
@@ -161,6 +211,31 @@ public class FilmDbStorage implements FilmStorage {
         }
 
         return directorFilms;
+    }
+
+    @Override
+    public List<Film> getRecommendations (Integer id) {
+        final String sqlQuery = "SELECT film_id FROM likes " +
+                                "WHERE user_id IN ( " +
+                                      "SELECT l.user_id FROM likes l " +
+                                      "WHERE l.film_id IN ( " +
+                                            "SELECT film_id FROM likes " +
+                                            "WHERE user_id = ? " +
+                                      ") AND user_id != ? " +
+                                      "GROUP BY l.user_id " +
+                                      "ORDER BY count(l.film_id) DESC " +
+                                      "LIMIT 1 " +
+                                      ") " +
+                                "AND film_id NOT IN ( " +
+                                        "SELECT film_id FROM likes " +
+                                        "WHERE user_id = ? " +
+                                ")";
+        List<Integer> recIds = jdbcTemplate.queryForList(sqlQuery, Integer.class, id, id, id);
+        List<Film> films = new ArrayList<>();
+        for (Integer recId : recIds) {
+            films.add(get(recId));
+        }
+        return films;
     }
 
     private Film mapToFilm(ResultSet resultSet, int rowNum) throws SQLException {

@@ -6,6 +6,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.model.Event;
+import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.service.EventService;
 import ru.yandex.practicum.filmorate.service.UserService;
@@ -63,6 +64,12 @@ public class UserController {
     public List<User> getFriends(@PathVariable int id) {
         log.info("Request endpoint: 'GET /users/{}/friends'", id);
         return userService.getFriends(id);
+    }
+
+    @GetMapping("/{id}/recommendations")
+    public List<Film> getRecommendations (@PathVariable Integer id) {
+        log.info("Request endpoint: 'GET /users/{}/recommendations'", id);
+        return userService.getRecommendations(id);
     }
 
     @GetMapping("/{id}/friends/common/{otherId}")
