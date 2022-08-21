@@ -9,13 +9,11 @@ import ru.yandex.practicum.filmorate.model.eventEnums.Operation;
 import ru.yandex.practicum.filmorate.storage.EventStorage;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
 
-import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.util.List;
 
 @Service
 public class EventService {
-    //TODO добавить методы к функциональности review
 
     @Autowired
     private EventStorage eventStorage;
@@ -39,7 +37,7 @@ public class EventService {
     }
 
     public Event removeFriendEvent(int userId, int friendId) {
-        return createEvent(userId, EventType.REVIEW, Operation.REMOVE, friendId);
+        return createEvent(userId, EventType.FRIEND, Operation.REMOVE, friendId);
     }
 
     public Event addLikeEvent(int userId, int filmId) {
@@ -54,18 +52,9 @@ public class EventService {
         return createEvent(userId, EventType.FRIEND, Operation.ADD, friendId);
     }
 
-    public Event updateLikeEvent(int userId, int filmId) {
-        return createEvent(userId, EventType.LIKE, Operation.UPDATE, filmId);
-    }
-
     public Event updateReviewEvent(int userId, int reviewId) {
         return createEvent(userId, EventType.REVIEW, Operation.UPDATE, reviewId);
     }
-
-    public Event updateReviewFriend(int userId, int friendId) {
-        return createEvent(userId, EventType.FRIEND, Operation.UPDATE, friendId);
-    }
-
 
     private Event createEvent(int userId, EventType eventType, Operation operation, int entityId) {
         Event event = new Event();
