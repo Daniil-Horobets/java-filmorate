@@ -30,6 +30,7 @@ class FilmDbStorageTest {
     UserDbStorage userDbStorage;
     private final Film testFilm = EntitiesForTests.getTestFilm();
     private final User testUser = EntitiesForTests.getTestUser();
+    private final User testFriend = EntitiesForTests.getTestFriend();
 
     @Test
     @Order(1)
@@ -88,5 +89,20 @@ class FilmDbStorageTest {
         Film filmWithoutLike = filmDbStorage.get(testFilm.getId());
 
         assertTrue(filmWithoutLike.getLikedUsersIds().isEmpty());
+    }
+
+    @Test
+    public void testGetCommonFilms() {
+        filmDbStorage.create(testFilm);
+        testUser.setEmail("stu1@mail");
+        testUser.setLogin("stu2Login");
+        userDbStorage.create(testUser);
+        testFriend.setEmail("stu2@mail");
+        testFriend.setLogin("stu2@mail");
+        userDbStorage.create(testFriend);
+        filmDbStorage.addLike(testUser, testFilm);
+        filmDbStorage.addLike(testFriend, testFilm);
+        assertEquals(testFilm, filmDbStorage.getCommonFilms(testUser.getId(), testFriend.getId()).get(0),
+                "Выборка 'Общие фильмы' (из одного элемента)  не совпадает с исходной");
     }
 }

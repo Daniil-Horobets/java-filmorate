@@ -263,6 +263,21 @@ public class FilmDbStorage implements FilmStorage {
     }
 
     @Override
+    public List<Film> getCommonFilms(int userId, int friendId){
+        final String sqlQueryCommonFilms =
+                "select FILM_ID from" +
+                        " (select FILM_ID, count(USER_ID) c from LIKES where FILM_ID in " +
+                        "(select FILM_ID from LIKES where USER_ID = ? intersect " +
+                        "select FILM_ID from LIKES where USER_ID = ?) group by FILM_ID order by c desc)";
+        List<Integer> ids = jdbcTemplate.queryForList(sqlQueryCommonFilms,Integer.class,userId,friendId);
+        List<Film> films = new ArrayList<>(Collections.emptyList());
+        for (int filmId : ids) {
+            films.add(get(filmId));
+        }
+        return films;
+    }
+
+    @Override
     public boolean delete(int filmId) {
         String sqlQuery = "DELETE FROM FILMS where FILM_ID = ?";
 
