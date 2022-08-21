@@ -84,3 +84,27 @@ create table if not exists FILM_DIRECTORS
         foreign key (DIRECTOR_ID) references DIRECTORS
             ON DELETE CASCADE
 );
+
+CREATE TABLE IF NOT EXISTS reviews
+(
+    review_id INTEGER auto_increment,
+    review_content VARCHAR(255) NOT NULL,
+    review_is_positive BOOLEAN NOT NULL,
+    user_id  INTEGER NOT NULL,
+    film_id  INTEGER NOT NULL,
+    review_usefulness  INTEGER NOT NULL,
+    CONSTRAINT reviews_pk PRIMARY key (review_id),
+    CONSTRAINT review_author_fk FOREIGN key (user_id) REFERENCES users,
+    CONSTRAINT review_film_fk FOREIGN key (film_id) REFERENCES films
+);
+
+CREATE TABLE IF NOT EXISTS reviews_reactions
+(
+    review_id INTEGER NOT NULL,
+    user_id INTEGER NOT NULL,
+    reaction_name VARCHAR(10) NOT NULL,
+    CONSTRAINT reviews_reactions_pk PRIMARY key (review_id, user_id),
+    CONSTRAINT review_reaction_fk FOREIGN key (review_id) REFERENCES reviews
+        ON DELETE CASCADE,
+    CONSTRAINT reaction_author_fk FOREIGN key (user_id) REFERENCES users
+);
