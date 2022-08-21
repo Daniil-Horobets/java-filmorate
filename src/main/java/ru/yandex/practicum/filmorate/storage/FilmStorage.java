@@ -15,6 +15,7 @@ public interface FilmStorage {
     void deleteLike(User user, Film film);
 
     List<Film> readBestDirectorFilms(int directorId, String param);
+    public List<Film> getRecommendations (Integer id);
 
     boolean delete(int id);
 }
