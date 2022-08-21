@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
 import ru.yandex.practicum.filmorate.validator.FilmValidator;
@@ -36,6 +37,12 @@ public class FilmService {
         return filmStorage.get(id);
     }
 
+    public List<Film> getFilmsByQuery(String query, List<String> by) {
+        List<Film> films = new ArrayList<>(filmStorage.getFilmsByQuery(query, by));
+        films.sort(Comparator.comparingInt((Film film) -> film.getLikedUsersIds().size()).reversed());
+        return films;
+    }
+
     public Film create(Film film) {
         FilmValidator.validateFilm(film);
         return filmStorage.create(film);
@@ -59,14 +66,44 @@ public class FilmService {
         filmStorage.deleteLike(userStorage.get(userId), filmStorage.get(filmId));
     }
 
-    public List<Film> getMostLikedFilms(int count) {
+    public List<Film> getMostLikedFilms(Integer count, Integer genreId, Integer year) {
         List<Film> toSort = new ArrayList<>(filmStorage.getAll());
-        toSort.sort(Comparator.comparingInt((Film film) -> film.getLikedUsersIds().size()).reversed());
         List<Film> list = new ArrayList<>();
+        toSort.sort(Comparator.comparingInt((Film film) -> film.getLikedUsersIds().size()).reversed());
         long limit = count;
-        for (Film film : toSort) {
-            if (limit-- == 0) break;
-            list.add(film);
+        if (genreId == null && year == null) {
+            for (Film film : toSort) {
+                if (limit-- == 0) break;
+                list.add(film);
+            }
+        }
+        if (genreId == null && year != null) {
+            for (Film film : toSort) {
+                if (limit-- == 0 ) break;
+                if (film.getReleaseDate().getYear() == year) {
+                    list.add(film);
+                }
+            }
+        }
+        if (genreId != null && year == null) {
+            Genre genre = new Genre();
+            genre.setId(genreId);
+            for (Film film : toSort) {
+                if (limit-- == 0 ) break;
+                if (film.getGenres().contains(genre)) {
+                    list.add(film);
+                }
+            }
+        }
+        if (genreId != null && year != null) {
+            Genre genre = new Genre();
+            genre.setId(genreId);
+            for (Film film : toSort) {
+                if (limit-- == 0 ) break;
+                if (film.getGenres().contains(genre) && film.getReleaseDate().getYear() == year) {
+                    list.add(film);
+                }
+            }
         }
         return list;
     }

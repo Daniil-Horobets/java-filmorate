@@ -1,5 +1,6 @@
 package ru.yandex.practicum.filmorate.storage;
 
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
@@ -10,7 +11,7 @@ import java.sql.*;
 import java.time.LocalDate;
 import java.util.List;
 
-@Repository
+@Repository("userDbStorage")
 public class UserDbStorage implements UserStorage {
 
     private final JdbcTemplate jdbcTemplate;
@@ -111,9 +112,12 @@ public class UserDbStorage implements UserStorage {
 
     @Override
     public boolean delete(int id) {
-
+        try {
         String sqlQuery = "DELETE FROM USERS where USER_ID = ?";
         return jdbcTemplate.update(sqlQuery, id) > 0;
+        } catch (EmptyResultDataAccessException e) {
+            return false;
+        }
     }
 
     private User mapToUser(ResultSet resultSet, int rowNum) throws SQLException {

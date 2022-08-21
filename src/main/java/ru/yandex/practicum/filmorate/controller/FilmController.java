@@ -42,6 +42,13 @@ public class FilmController {
         return filmService.getById(id);
     }
 
+    @GetMapping("/search")
+    public List<Film> getFilmsByQuery (@RequestParam String query,
+                                       @RequestParam List<String> by) {
+        log.info("Request endpoint: 'GET /films/search?query={}'", query);
+        return filmService.getFilmsByQuery(query, by);
+    }
+
     @PutMapping("/{id}/like/{userId}")
     public void addLike(@PathVariable int id, @PathVariable int userId) {
         log.info("Request endpoint: 'PUT /films/{}/like/{}'", id, userId);
@@ -55,9 +62,12 @@ public class FilmController {
     }
 
     @GetMapping("/popular")
-    public List<Film> getMostLikedFilms(@RequestParam(defaultValue = "10") int count) {
-        log.info("Request endpoint: 'GET /films/popular?count={}'", count);
-        return filmService.getMostLikedFilms(count);
+    public List<Film> getMostLikedFilms(
+            @RequestParam(defaultValue = "10", name = "count") Integer count,
+            @RequestParam(required = false, name = "genreId") Integer genreId,
+            @RequestParam(required = false, name = "year") Integer year) {
+        log.info("Request endpoint: 'GET /films/popular?count={}&genreId={}&year={}'", count, genreId, year);
+        return filmService.getMostLikedFilms(count, genreId, year);
     }
 
     @GetMapping("/common")

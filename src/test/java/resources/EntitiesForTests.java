@@ -5,6 +5,7 @@ import ru.yandex.practicum.filmorate.model.Mpa;
 import ru.yandex.practicum.filmorate.model.User;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.HashSet;
 
 public class EntitiesForTests {
@@ -16,6 +17,7 @@ public class EntitiesForTests {
             120,
             new Mpa(1, null),
             new HashSet<>(),
+            new ArrayList<>(),
             new HashSet<>()
     );
 
