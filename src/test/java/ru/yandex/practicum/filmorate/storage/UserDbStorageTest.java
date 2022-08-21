@@ -10,6 +10,7 @@ import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabas
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
 import resources.EntitiesForTests;
+import ru.yandex.practicum.filmorate.model.Event;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
 
@@ -26,10 +27,12 @@ class UserDbStorageTest {
 
     private final UserDbStorage userDbStorage;
     private final FilmDbStorage filmDbStorage;
+    private final EventDbStorage eventDbStorage;
     private final User testUser = EntitiesForTests.getTestUser();
     private final Film testFilm = EntitiesForTests.getTestFilm();
     private final User testFriend = EntitiesForTests.getTestFriend();
 
+    private final Event testEvent = EntitiesForTests.getTestEvent();
     @Test
     @Order(1)
     public void testGetAll() {
@@ -85,4 +88,16 @@ class UserDbStorageTest {
 
         assertTrue(filmWithoutFriend.getFriendsIds().isEmpty());
     }
+
+    @Test
+    @Order(7)
+    public void testFeedPositive() {
+        eventDbStorage.createEvent(testEvent);
+        List<Event> events = eventDbStorage.getUserEvents(testEvent.getUserId());
+        assertEquals(events.size(),1,"Не совпадают размеры выборки");
+        assertEquals(testEvent,events.get(0),"Не совпадают объекты выборки");
+        System.out.println("Исходный объект: " + testEvent);
+        System.out.println("Полученный объект: " + events.get(0));
+    }
+
 }

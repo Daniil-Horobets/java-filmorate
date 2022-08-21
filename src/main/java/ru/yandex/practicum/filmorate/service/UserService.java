@@ -24,6 +24,9 @@ public class UserService {
     @Autowired
     private FilmStorage filmStorage;
 
+    @Autowired
+    private EventService eventService;
+
     public List<User> getAll() {
         return userStorage.getAll();
     }
@@ -54,12 +57,14 @@ public class UserService {
         checkUserExistence(userId, userStorage);
         checkUserExistence(friendId, userStorage);
         userStorage.addFriend(userStorage.get(userId), userStorage.get(friendId));
+        eventService.addFriendEvent(userId, friendId);
     }
 
     public void deleteFriend(int userId, int friendId) {
         checkUserExistence(userId, userStorage);
         checkUserExistence(friendId, userStorage);
         userStorage.deleteFriend(userStorage.get(userId), userStorage.get(friendId));
+        eventService.removeFriendEvent(userId, friendId);
     }
 
     public List<User> getFriends(int id) {
