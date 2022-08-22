@@ -1,5 +1,6 @@
 package ru.yandex.practicum.filmorate.storage;
 
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.model.Film;
@@ -52,23 +53,21 @@ public class GenreDbStorage implements GenreStorage {
     }
 
     @Override
-    public void loadFilmGenre(Film film) {
-        final String sqlQuery =
-                "SELECT g.genre_id, g.genre_name " +
-                "FROM genres_of_films gof " +
-                "JOIN genres g ON gof.genre_id = g.genre_id " +
-                "WHERE gof.film_id =?";
+    public Set<Genre> loadFilmGenre(int filmId) {
 
-        Set<Genre> set = new HashSet<>();
-        for (Map<String, Object> row : jdbcTemplate.queryForList(sqlQuery, film.getId())) {
-            Genre genre = new Genre(
-                    (Integer) row.get("genre_id"),
-                    (String) row.get("genre_name"));
-            set.add(genre);
+        Set<Genre> filmGenres = new HashSet<>();
+
+        try {
+            for(Genre genre : jdbcTemplate.query("SELECT * FROM GENRES WHERE GENRE_ID IN (SELECT GENRE_ID " +
+                    "FROM GENRES_OF_FILMS WHERE FILM_ID=?)", this::mapToGenre, filmId)) {
+                filmGenres.add(genre);
+            }
+
+            return filmGenres;
+
+        } catch (EmptyResultDataAccessException e) {
+            return new HashSet<>();
         }
-        film.setGenres(
-                set
-        );
     }
 
     private Genre mapToGenre(ResultSet resultSet, int rowNum) throws SQLException {

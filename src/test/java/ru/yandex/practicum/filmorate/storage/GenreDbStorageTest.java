@@ -21,9 +21,10 @@ import static org.junit.jupiter.api.Assertions.assertNotEquals;
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
 @DirtiesContext(classMode= DirtiesContext.ClassMode.AFTER_CLASS)
 class GenreDbStorageTest {
-    private final GenreDbStorage genreDbStorage;
-
-    private final FilmDbStorage filmDbStorage;
+    @Autowired
+    GenreDbStorage genreDbStorage;
+    @Autowired
+    FilmDbStorage filmDbStorage;
 
     private final Film testFilm = EntitiesForTests.getTestFilm();
 
@@ -61,7 +62,7 @@ class GenreDbStorageTest {
     @Test
     public void testLoadFilmGenre() {
         testFilm.setGenres(Set.of(genreDbStorage.get(3)));
-        genreDbStorage.loadFilmGenre(testFilm);
+        genreDbStorage.loadFilmGenre(testFilm.getId());
 
         for (Genre genre : testFilm.getGenres()) {
             System.out.println(genre.getId());

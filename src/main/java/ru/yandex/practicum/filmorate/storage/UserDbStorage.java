@@ -16,8 +16,11 @@ public class UserDbStorage implements UserStorage {
 
     private final JdbcTemplate jdbcTemplate;
 
-    public UserDbStorage(JdbcTemplate jdbcTemplate) {
+    private final FilmStorage filmStorage;
+
+    public UserDbStorage(JdbcTemplate jdbcTemplate, FilmStorage filmStorage) {
         this.jdbcTemplate = jdbcTemplate;
+        this.filmStorage = filmStorage;
     }
 
     @Override
@@ -114,6 +117,7 @@ public class UserDbStorage implements UserStorage {
     public boolean delete(int id) {
         try {
         String sqlQuery = "DELETE FROM USERS where USER_ID = ?";
+        filmStorage.updateFilmRatings(id);
         return jdbcTemplate.update(sqlQuery, id) > 0;
         } catch (EmptyResultDataAccessException e) {
             return false;

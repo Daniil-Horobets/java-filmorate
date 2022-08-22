@@ -13,6 +13,7 @@ import java.util.Set;
 @AllArgsConstructor
 @RequiredArgsConstructor
 @EqualsAndHashCode(of = "id")
+@ToString
 public class Film {
     private int id;
     private String name;
@@ -23,5 +24,5 @@ public class Film {
     private Set<Genre> genres;
     private List<Director> directors;
     @JsonIgnore
-    private Set<Integer> likedUsersIds = new HashSet<>();
+    private String userRating;
 }
