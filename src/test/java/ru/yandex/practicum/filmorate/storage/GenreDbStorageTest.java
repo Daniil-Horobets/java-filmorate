@@ -11,8 +11,10 @@ import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
 
 import java.util.List;
+import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
 @SpringBootTest
 @AutoConfigureTestDatabase
@@ -49,11 +51,11 @@ class GenreDbStorageTest {
 
     @Test
     public void testSetFilmGenre() {
-        testFilm.setGenres(List.of(genreDbStorage.get(1)));
+        testFilm.setGenres(Set.of(genreDbStorage.get(1)));
         filmDbStorage.create(testFilm);
         genreDbStorage.setFilmGenre(testFilm);
 
-        assertEquals(List.of(genreDbStorage.get(1)), filmDbStorage.get(testFilm.getId()).getGenres());
+        assertEquals(Set.of(genreDbStorage.get(1)), filmDbStorage.get(testFilm.getId()).getGenres());
     }
 
     @Test
