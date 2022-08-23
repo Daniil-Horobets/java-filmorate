@@ -12,10 +12,10 @@ import ru.yandex.practicum.filmorate.model.enums.Operation;
 @NoArgsConstructor
 @EqualsAndHashCode(of = "entityId")
 public class Event {
-    Long eventId;
-    int userId;
-    Long timestamp;
-    EventType eventType;
-    Operation operation;
-    int entityId;
+    private Long eventId;
+    private int userId;
+    private Long timestamp;
+    private EventType eventType;
+    private Operation operation;
+    private int entityId;
 }
