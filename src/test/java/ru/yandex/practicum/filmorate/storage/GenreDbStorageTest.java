@@ -51,7 +51,7 @@ class GenreDbStorageTest {
 
     @Test
     public void testSetFilmGenre() {
-        testFilm.setGenres(Set.of(genreDbStorage.get(1)));
+        testFilm.setGenres(List.of(genreDbStorage.get(1)));
         filmDbStorage.create(testFilm);
         genreDbStorage.setFilmGenre(testFilm);
 
@@ -60,8 +60,8 @@ class GenreDbStorageTest {
 
     @Test
     public void testLoadFilmGenre() {
-        testFilm.setGenres(Set.of(genreDbStorage.get(3)));
-        genreDbStorage.loadFilmGenre(testFilm);
+        testFilm.setGenres(List.of(genreDbStorage.get(3)));
+        genreDbStorage.loadFilmGenre(testFilm.getId());
 
         for (Genre genre : testFilm.getGenres()) {
             System.out.println(genre.getId());

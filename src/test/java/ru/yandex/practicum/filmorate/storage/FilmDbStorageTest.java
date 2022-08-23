@@ -20,7 +20,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 @AutoConfigureTestDatabase
-//@RequiredArgsConstructor //(onConstructor_ = @Autowired)
+@RequiredArgsConstructor (onConstructor_ = @Autowired)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @DirtiesContext(classMode= DirtiesContext.ClassMode.AFTER_CLASS)
 class FilmDbStorageTest {
@@ -65,30 +65,6 @@ class FilmDbStorageTest {
         Film updatedFilm = filmDbStorage.get(filmToUpdate.getId());
 
         assertEquals(filmToUpdate, updatedFilm);
-    }
-
-    @Test
-    @Order(5)
-    public void testAddLike() {
-        User secondTestUser = testUser;
-        secondTestUser.setId(3);
-        secondTestUser.setEmail("stu@mail");
-        secondTestUser.setLogin("stuLogin");
-
-        userDbStorage.create(secondTestUser);
-        filmDbStorage.addLike(secondTestUser,testFilm);
-        Film filmWithLike = filmDbStorage.get(testFilm.getId());
-
-        assertTrue(filmWithLike.getLikedUsersIds().contains(secondTestUser.getId()));
-    }
-
-    @Test
-    @Order(6)
-    public void testDeleteLike() {
-        filmDbStorage.deleteLike(testUser,testFilm);
-        Film filmWithoutLike = filmDbStorage.get(testFilm.getId());
-
-        assertTrue(filmWithoutLike.getLikedUsersIds().isEmpty());
     }
 
     @Test
