@@ -45,30 +45,20 @@ public class GenreDbStorage implements GenreStorage {
         final String sqlQueryDelete = "DELETE FROM genres_of_films WHERE film_id = ?";
         jdbcTemplate.update(sqlQueryDelete, film.getId());
 
-        final String sqlQueryInsert = "INSERT INTO genres_of_films (genre_id, film_id) VALUES (?, ?)";
+        final String sqlQueryInsert = "MERGE INTO genres_of_films (genre_id, film_id) VALUES (?, ?)";
         for (Genre genre : film.getGenres()) {
             jdbcTemplate.update(sqlQueryInsert, genre.getId(), film.getId());
         }
     }
 
     @Override
-    public void loadFilmGenre(Film film) {
-        final String sqlQuery =
-                "SELECT g.genre_id, g.genre_name " +
+    public List<Genre> loadFilmGenre(int filmId) {
+        final String sqlQuery = "SELECT g.genre_id, g.genre_name " +
                 "FROM genres_of_films gof " +
                 "JOIN genres g ON gof.genre_id = g.genre_id " +
                 "WHERE gof.film_id =?";
 
-        Set<Genre> set = new HashSet<>();
-        for (Map<String, Object> row : jdbcTemplate.queryForList(sqlQuery, film.getId())) {
-            Genre genre = new Genre(
-                    (Integer) row.get("genre_id"),
-                    (String) row.get("genre_name"));
-            set.add(genre);
-        }
-        film.setGenres(
-                set
-        );
+        return jdbcTemplate.query(sqlQuery, this::mapToGenre, filmId);
     }
 
     private Genre mapToGenre(ResultSet resultSet, int rowNum) throws SQLException {
