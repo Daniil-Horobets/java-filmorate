@@ -13,6 +13,7 @@ import java.sql.Date;
 import java.sql.*;
 import java.time.LocalDate;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Repository("filmDbStorage")
 public class FilmDbStorage implements FilmStorage {
@@ -231,11 +232,10 @@ public class FilmDbStorage implements FilmStorage {
                                         "WHERE user_id = ? " +
                                 ")";
         List<Integer> recIds = jdbcTemplate.queryForList(sqlQuery, Integer.class, id, id, id);
-        List<Film> films = new ArrayList<>();
-        for (Integer recId : recIds) {
-            films.add(get(recId));
-        }
-        return films;
+        return recIds
+                .stream()
+                .map(this::get)
+                .collect(Collectors.toList());
     }
 
     private Film mapToFilm(ResultSet resultSet, int rowNum) throws SQLException {
@@ -270,11 +270,10 @@ public class FilmDbStorage implements FilmStorage {
                         "(select FILM_ID from LIKES where USER_ID = ? intersect " +
                         "select FILM_ID from LIKES where USER_ID = ?) group by FILM_ID order by c desc)";
         List<Integer> ids = jdbcTemplate.queryForList(sqlQueryCommonFilms,Integer.class,userId,friendId);
-        List<Film> films = new ArrayList<>(Collections.emptyList());
-        for (int filmId : ids) {
-            films.add(get(filmId));
-        }
-        return films;
+        return ids
+                .stream()
+                .map(this::get)
+                .collect(Collectors.toList());
     }
 
     @Override

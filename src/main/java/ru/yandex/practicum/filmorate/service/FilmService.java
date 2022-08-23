@@ -13,6 +13,7 @@ import ru.yandex.practicum.filmorate.validator.FilmValidator;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class FilmService {
@@ -72,45 +73,14 @@ public class FilmService {
     }
 
     public List<Film> getMostLikedFilms(Integer count, Integer genreId, Integer year) {
-        List<Film> toSort = new ArrayList<>(filmStorage.getAll());
-        List<Film> list = new ArrayList<>();
-        toSort.sort(Comparator.comparingInt((Film film) -> film.getLikedUsersIds().size()).reversed());
-        long limit = count;
-        if (genreId == null && year == null) {
-            for (Film film : toSort) {
-                if (limit-- == 0) break;
-                list.add(film);
-            }
-        }
-        if (genreId == null && year != null) {
-            for (Film film : toSort) {
-                if (limit-- == 0 ) break;
-                if (film.getReleaseDate().getYear() == year) {
-                    list.add(film);
-                }
-            }
-        }
-        if (genreId != null && year == null) {
-            Genre genre = new Genre();
-            genre.setId(genreId);
-            for (Film film : toSort) {
-                if (limit-- == 0 ) break;
-                if (film.getGenres().contains(genre)) {
-                    list.add(film);
-                }
-            }
-        }
-        if (genreId != null && year != null) {
-            Genre genre = new Genre();
-            genre.setId(genreId);
-            for (Film film : toSort) {
-                if (limit-- == 0 ) break;
-                if (film.getGenres().contains(genre) && film.getReleaseDate().getYear() == year) {
-                    list.add(film);
-                }
-            }
-        }
-        return list;
+
+        return filmStorage.getAll()
+                .stream()
+                .sorted(Comparator.comparingInt((Film film) -> film.getLikedUsersIds().size()).reversed())
+                .filter(film -> genreId == null || film.getGenres().contains(new Genre(genreId, null)))
+                .filter(film -> year == null || film.getReleaseDate().getYear() == year)
+                .limit(count)
+                .collect(Collectors.toList());
     }
 
     public List<Film> getCommonFilms(int userId, int friendId) {
