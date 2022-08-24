@@ -30,12 +30,12 @@ public class DirectorRepository implements IDirectorRepository{
 
         if (director.getId() != null && !director.getName().isBlank()) {
 
-            String sqlQuery = "insert into DIRECTORS (DIRECTOR_NAME) values ( ? )";
+            String sqlQuery = "INSERT INTO directors (director_name) VALUES ( ? )";
 
             KeyHolder keyHolder = new GeneratedKeyHolder();
 
             jdbcTemplate.update(connection -> {
-                PreparedStatement stmt = connection.prepareStatement(sqlQuery, new String[]{"DIRECTOR_ID"});
+                PreparedStatement stmt = connection.prepareStatement(sqlQuery, new String[]{"director_id"});
                 stmt.setString(1, director.getName());
                 return stmt;
             }, keyHolder);
@@ -52,8 +52,8 @@ public class DirectorRepository implements IDirectorRepository{
 
         if (!read(director.getId()).isEmpty()) {
 
-            String sqlQuery = "update DIRECTORS set " +
-                    "DIRECTOR_NAME = ? where DIRECTOR_ID = ?";
+            String sqlQuery = "UPDATE directors SET " +
+                    "director_name = ? WHERE director_id = ?";
 
             return jdbcTemplate.update(sqlQuery
                     , director.getName()
@@ -65,14 +65,14 @@ public class DirectorRepository implements IDirectorRepository{
 
     @Override
     public List<Director> readAll() {
-        return jdbcTemplate.query("SELECT * FROM DIRECTORS", this::mapRowToDirector);
+        return jdbcTemplate.query("SELECT * FROM directors", this::mapRowToDirector);
 
     }
 
     @Override
     public Optional<Director> read(int id) {
         try {
-            return Optional.of(jdbcTemplate.queryForObject("SELECT * FROM DIRECTORS WHERE DIRECTOR_ID = ?", this::mapRowToDirector, id));
+            return Optional.of(jdbcTemplate.queryForObject("SELECT * FROM directors WHERE director_id = ?", this::mapRowToDirector, id));
         } catch (EmptyResultDataAccessException e) {
             return Optional.empty();
         }
@@ -81,7 +81,7 @@ public class DirectorRepository implements IDirectorRepository{
     @Override
     public boolean delete(int id) {
 
-        String sqlQuery = "DELETE FROM DIRECTORS where DIRECTOR_ID = ?";
+        String sqlQuery = "DELETE FROM directors where director_id = ?";
         return jdbcTemplate.update(sqlQuery, id) > 0;
     }
 
@@ -97,8 +97,8 @@ public class DirectorRepository implements IDirectorRepository{
 
         deleteFilmDirectors(film.getId());
 
-        String sqlQuery2 = "INSERT into FILM_DIRECTORS (FILM_ID, DIRECTOR_ID) " +
-                "values (?, ?)";
+        String sqlQuery2 = "INSERT INTO film_directors (film_id, director_id) " +
+                "VALUES (?, ?)";
 
         if (!film.getDirectors().isEmpty()) {
 
@@ -116,8 +116,8 @@ public class DirectorRepository implements IDirectorRepository{
     public List<Director> loadFilmDirectors(int filmId) {
 
         try {
-            return jdbcTemplate.query("SELECT * FROM DIRECTORS WHERE DIRECTOR_ID IN (SELECT DIRECTOR_ID " +
-                    "FROM FILM_DIRECTORS WHERE FILM_ID=?)", this::mapRowToDirector, filmId);
+            return jdbcTemplate.query("SELECT * FROM directors WHERE director_id IN (SELECT director_id " +
+                    "FROM film_directors WHERE film_id=?)", this::mapRowToDirector, filmId);
         } catch (EmptyResultDataAccessException e) {
             return new ArrayList<>();
         }
@@ -125,7 +125,7 @@ public class DirectorRepository implements IDirectorRepository{
 
     @Override
     public boolean deleteFilmDirectors(int filmId) {
-        String sqlQuery = "DELETE FROM FILM_DIRECTORS where FILM_ID = ?";
+        String sqlQuery = "DELETE FROM film_directors WHERE film_id = ?";
         try {
             return jdbcTemplate.update(sqlQuery, filmId) > 0;
         } catch (EmptyResultDataAccessException e) {
@@ -144,8 +144,8 @@ public class DirectorRepository implements IDirectorRepository{
 
     private Director mapRowToDirector(ResultSet resultSet, int rowNum) throws SQLException {
         return Director.builder()
-                .id(resultSet.getInt("DIRECTOR_ID"))
-                .name(resultSet.getString("DIRECTOR_NAME"))
+                .id(resultSet.getInt("director_id"))
+                .name(resultSet.getString("director_name"))
                 .build();
     }
 }
