@@ -13,7 +13,8 @@ import ru.yandex.practicum.filmorate.model.Genre;
 import java.util.List;
 import java.util.Set;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
 @SpringBootTest
 @AutoConfigureTestDatabase
@@ -21,7 +22,7 @@ import static org.junit.jupiter.api.Assertions.*;
 @DirtiesContext(classMode= DirtiesContext.ClassMode.AFTER_CLASS)
 class GenreDbStorageTest {
     private final GenreDbStorage genreDbStorage;
-
+    @Autowired
     private final FilmDbStorage filmDbStorage;
 
     private final Film testFilm = EntitiesForTests.getTestFilm();
@@ -50,17 +51,17 @@ class GenreDbStorageTest {
 
     @Test
     public void testSetFilmGenre() {
-        testFilm.setGenres(Set.of(genreDbStorage.get(1)));
+        testFilm.setGenres(List.of(genreDbStorage.get(1)));
         filmDbStorage.create(testFilm);
         genreDbStorage.setFilmGenre(testFilm);
 
-        assertEquals(Set.of(genreDbStorage.get(1)), filmDbStorage.get(testFilm.getId()).getGenres());
+        assertEquals(List.of(genreDbStorage.get(1)), filmDbStorage.get(testFilm.getId()).getGenres());
     }
 
     @Test
     public void testLoadFilmGenre() {
-        testFilm.setGenres(Set.of(genreDbStorage.get(3)));
-        genreDbStorage.loadFilmGenre(testFilm);
+        testFilm.setGenres(List.of(genreDbStorage.get(3)));
+        genreDbStorage.loadFilmGenre(testFilm.getId());
 
         for (Genre genre : testFilm.getGenres()) {
             System.out.println(genre.getId());

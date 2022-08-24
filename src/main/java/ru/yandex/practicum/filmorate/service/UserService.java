@@ -4,7 +4,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
+import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.storage.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
 import ru.yandex.practicum.filmorate.validator.UserValidator;
 
@@ -19,6 +21,11 @@ public class UserService {
     @Qualifier("userDbStorage")
     @Autowired
     private UserStorage userStorage;
+    @Autowired
+    private FilmStorage filmStorage;
+
+    @Autowired
+    private EventService eventService;
 
     public List<User> getAll() {
         return userStorage.getAll();
@@ -50,12 +57,14 @@ public class UserService {
         checkUserExistence(userId, userStorage);
         checkUserExistence(friendId, userStorage);
         userStorage.addFriend(userStorage.get(userId), userStorage.get(friendId));
+        eventService.addFriendEvent(userId, friendId);
     }
 
     public void deleteFriend(int userId, int friendId) {
         checkUserExistence(userId, userStorage);
         checkUserExistence(friendId, userStorage);
         userStorage.deleteFriend(userStorage.get(userId), userStorage.get(friendId));
+        eventService.removeFriendEvent(userId, friendId);
     }
 
     public List<User> getFriends(int id) {
@@ -77,6 +86,10 @@ public class UserService {
             }
         }
         return list;
+    }
+
+    public List<Film> getRecommendations (Integer id) {
+        return filmStorage.getRecommendations(id);
     }
 
     public void checkUserExistence(int userId, UserStorage userStorage) {

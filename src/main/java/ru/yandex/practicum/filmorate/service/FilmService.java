@@ -9,9 +9,8 @@ import ru.yandex.practicum.filmorate.storage.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
 import ru.yandex.practicum.filmorate.validator.FilmValidator;
 
-import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class FilmService {
@@ -27,6 +26,9 @@ public class FilmService {
     @Autowired
     private UserService userService;
 
+    @Autowired
+    private EventService eventService;
+
     public List<Film> getAll() {
         return filmStorage.getAll();
     }
@@ -34,6 +36,11 @@ public class FilmService {
     public Film getById(int id) {
         checkFilmExistence(id, filmStorage);
         return filmStorage.get(id);
+    }
+
+    public List<Film> getFilmsByQuery(String query, List<String> by) {
+        return filmStorage.getFilmsByQuery(query, by);
+
     }
 
     public Film create(Film film) {
@@ -51,24 +58,25 @@ public class FilmService {
         userService.checkUserExistence(userId, userStorage);
         checkFilmExistence(filmId, filmStorage);
         filmStorage.addLike(userStorage.get(userId), filmStorage.get(filmId));
+        eventService.addLikeEvent(userId, filmId);
     }
 
     public void deleteLike(int userId, int filmId) {
         userService.checkUserExistence(userId, userStorage);
         checkFilmExistence(filmId, filmStorage);
         filmStorage.deleteLike(userStorage.get(userId), filmStorage.get(filmId));
+        eventService.removeLikeEvent(userId, filmId);
     }
 
-    public List<Film> getMostLikedFilms(int count) {
-        List<Film> toSort = new ArrayList<>(filmStorage.getAll());
-        toSort.sort(Comparator.comparingInt((Film film) -> film.getLikedUsersIds().size()).reversed());
-        List<Film> list = new ArrayList<>();
-        long limit = count;
-        for (Film film : toSort) {
-            if (limit-- == 0) break;
-            list.add(film);
-        }
-        return list;
+    public List<Film> getMostLikedFilms(Integer count, Optional<Integer> genreId, Optional<Integer> year) {
+        return filmStorage.getMostLikedFilms(count, genreId, year);
+
+    }
+
+    public List<Film> getCommonFilms(int userId, int friendId) {
+        userService.checkUserExistence(userId, userStorage);
+        userService.checkUserExistence(friendId, userStorage);
+        return filmStorage.getCommonFilms(userId, friendId);
     }
 
     public void checkFilmExistence(int filmId, FilmStorage filmStorage) {
@@ -81,5 +89,9 @@ public class FilmService {
 
     public boolean delete(int id) {
         return filmStorage.delete(id);
+    }
+
+    public List<Film> readBestDirectorFilms (int directorId, String condition) {
+        return filmStorage.readBestDirectorFilms(directorId, condition);
     }
 }
