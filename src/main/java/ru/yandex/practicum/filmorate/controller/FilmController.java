@@ -65,6 +65,18 @@ public class FilmController {
         filmService.deleteMark(userId, filmId);
     }
 
+    @PutMapping("/{id}/like/{userId}")
+    public void addLike(@PathVariable int id, @PathVariable int userId) {
+        log.info("Request endpoint: 'PUT /films/{}/like/{}'", id, userId);
+        filmService.addLike(userId, id);
+    }
+
+    @DeleteMapping("/{filmId}/like/{userId}")
+    public void deleteLike(@PathVariable int filmId, @PathVariable int userId) {
+        log.info("Request endpoint: 'DELETE /films/{}/like/{}'", filmId, userId);
+        filmService.deleteMark(userId, filmId);
+    }
+
     @GetMapping("/popular")
     public List<Film> getBestFilms(
             @RequestParam(defaultValue = "10", name = "count") Integer count,

@@ -11,7 +11,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
 import resources.EntitiesForTests;
 import ru.yandex.practicum.filmorate.model.Event;
-import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
 
 import java.util.ArrayList;
@@ -28,7 +27,6 @@ class UserDbStorageTest {
     private final UserDbStorage userDbStorage;
     private final EventDbStorage eventDbStorage;
     private final User testUser = EntitiesForTests.getTestUser();
-    private final Film testFilm = EntitiesForTests.getTestFilm();
     private final User testFriend = EntitiesForTests.getTestFriend();
 
     private final Event testEvent = EntitiesForTests.getTestEvent();

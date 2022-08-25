@@ -1,7 +1,5 @@
 package ru.yandex.practicum.filmorate.service;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.AlreadyExistsException;
@@ -14,26 +12,27 @@ import java.util.List;
 
 @Service
 public class ReviewService {
-    @Qualifier("reviewDbStorage")
-    @Autowired
-    private ReviewStorage reviewStorage;
 
-    @Qualifier("filmDbStorage")
-    @Autowired
-    private FilmStorage filmStorage;
+    private final ReviewStorage reviewStorage;
 
-    @Qualifier("userDbStorage")
-    @Autowired
-    private UserStorage userStorage;
+    private final FilmStorage filmStorage;
 
-    @Autowired
-    private FilmService filmService;
+    private final UserStorage userStorage;
 
-    @Autowired
-    private UserService userService;
+    private final FilmService filmService;
 
-    @Autowired
-    private EventService eventService;
+    private final UserService userService;
+
+    private final EventService eventService;
+
+    public ReviewService(ReviewStorage reviewStorage, FilmStorage filmStorage, UserStorage userStorage, FilmService filmService, UserService userService, EventService eventService) {
+        this.reviewStorage = reviewStorage;
+        this.filmStorage = filmStorage;
+        this.userStorage = userStorage;
+        this.filmService = filmService;
+        this.userService = userService;
+        this.eventService = eventService;
+    }
 
     public Review create(Review review){
         filmService.checkFilmExistence(review.getFilmId(), filmStorage);

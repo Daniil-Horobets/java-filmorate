@@ -25,14 +25,11 @@ import static org.junit.jupiter.api.Assertions.*;
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @DirtiesContext(classMode= DirtiesContext.ClassMode.AFTER_CLASS)
 class FilmDbStorageTest {
-    @Autowired
-    FilmService filmService;
-    @Autowired
-    UserDbStorage userDbStorage;
-    @Autowired
-    IDirectorRepository iDirectorRepository;
-    @Autowired
-    FilmStorage filmStorage;
+
+    private final FilmService filmService;
+    private final UserDbStorage userDbStorage;
+    private final DirectorStorage directorStorage;
+    private final FilmStorage filmStorage;
     private final Film testFilm = EntitiesForTests.getTestFilm();
     private final Film testFilm2 = EntitiesForTests.getTestFilm2();
     private final Film testFilm3 = EntitiesForTests.getTestFilm3();
@@ -63,8 +60,8 @@ class FilmDbStorageTest {
     @Test
     @Order(3)
     public void testCreate() {
-        iDirectorRepository.create(testDirector);
-        iDirectorRepository.create(testDirector2);
+        directorStorage.create(testDirector);
+        directorStorage.create(testDirector2);
         filmService.create(testFilm);
         Film createdFilm = filmService.getById(testFilm.getId());
         assertEquals(testFilm, createdFilm);
@@ -158,7 +155,7 @@ class FilmDbStorageTest {
     @Order(10)
     public void testBestFilmsSortByDirectorRating() {
 
-        List<Film> bestDirectorFilms = filmStorage.readBestDirectorFilms(1, "rate");
+        List<Film> bestDirectorFilms = filmStorage.readBestDirectorFilms(1, "likes");
 
         assertEquals(3, bestDirectorFilms.size());
         assertEquals(5, bestDirectorFilms.get(0).getId());
@@ -173,9 +170,9 @@ class FilmDbStorageTest {
         List<Film> bestDirectorFilms = filmStorage.readBestDirectorFilms(1, "year");
 
         assertEquals(3, bestDirectorFilms.size());
-        assertEquals(5, bestDirectorFilms.get(0).getId());
+        assertEquals(2, bestDirectorFilms.get(0).getId());
         assertEquals(1, bestDirectorFilms.get(1).getId());
-        assertEquals(2, bestDirectorFilms.get(2).getId());
+        assertEquals(5, bestDirectorFilms.get(2).getId());
     }
 
     @Test
@@ -228,9 +225,8 @@ class FilmDbStorageTest {
 
         List<Film> recommendedFilms = filmStorage.getRecommendations( 3);
 
-        assertEquals(2, recommendedFilms.size());
-        assertEquals(5, recommendedFilms.get(0).getId());
-        assertEquals(2, recommendedFilms.get(1).getId());
+        assertEquals(1, recommendedFilms.size());
+        assertEquals(2, recommendedFilms.get(0).getId());
     }
 
     @Test
@@ -241,10 +237,9 @@ class FilmDbStorageTest {
 
         List<Film> recommendedFilms = filmStorage.getRecommendations( 3);
 
-        assertEquals(3, recommendedFilms.size());
-        assertEquals(1, recommendedFilms.get(0).getId());
-        assertEquals(5, recommendedFilms.get(1).getId());
-        assertEquals(2, recommendedFilms.get(2).getId());
+        assertEquals(2, recommendedFilms.size());
+        assertEquals(2, recommendedFilms.get(0).getId());
+        assertEquals(1, recommendedFilms.get(1).getId());
     }
     @Test
     @Order(17)
@@ -300,7 +295,6 @@ class FilmDbStorageTest {
         filmService.addMark(testUser3.getId(),testFilm2.getId(), Optional.of(6));
         filmService.addMark(testUser3.getId(),testFilm5.getId(), Optional.of(10));
 
-
         List<Film> SearchFilms = filmService.getFilmsByQuery("Name1", new ArrayList<>(List.of("director")));
 
         assertEquals(3, SearchFilms.size());
@@ -315,10 +309,6 @@ class FilmDbStorageTest {
 
         List<Film> SearchFilms = filmService.getFilmsByQuery("FilmName5", new ArrayList<>(List.of("title")));
 
-        for(Film film : SearchFilms) {
-            System.out.println(film);
-        }
-
         assertEquals(1, SearchFilms.size());
         assertEquals(5, SearchFilms.get(0).getId());
 
@@ -330,14 +320,10 @@ class FilmDbStorageTest {
 
         List<Film> SearchFilms = filmService.getFilmsByQuery("Name2", new ArrayList<>(List.of("title", "director")));
 
-        for(Film film : SearchFilms) {
-            System.out.println(film);
-        }
-
         assertEquals(3, SearchFilms.size());
-        assertEquals(3, SearchFilms.get(0).getId());
-        assertEquals(2, SearchFilms.get(1).getId());
-        assertEquals(4, SearchFilms.get(2).getId());
+        assertEquals(4, SearchFilms.get(0).getId());
+        assertEquals(3, SearchFilms.get(1).getId());
+        assertEquals(2, SearchFilms.get(2).getId());
 
     }
 

@@ -66,6 +66,10 @@ public class FilmService {
         eventService.removeLikeEvent(userId, filmId);
     }
 
+    public void addLike(int userId, int filmId) {
+        addMark(userId, filmId, Optional.of(10));
+    }
+
     public List<Film> getBestFilms(Integer count, Optional<Integer> genreId, Optional<Integer> year) {
 
         return filmStorage.readBestFilms(count, genreId, year);
