@@ -10,10 +10,8 @@ import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabas
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
 import resources.EntitiesForTests;
-import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
-import ru.yandex.practicum.filmorate.service.FilmService;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,7 +25,7 @@ import static org.junit.jupiter.api.Assertions.*;
 @DirtiesContext(classMode= DirtiesContext.ClassMode.AFTER_CLASS)
 class FilmDbStorageTest {
     @Autowired
-    FilmService filmService;
+    FilmDbStorage filmDbStorage;
     @Autowired
     UserDbStorage userDbStorage;
     private final Film testFilm = EntitiesForTests.getTestFilm();
@@ -37,7 +35,7 @@ class FilmDbStorageTest {
     @Test
     @Order(1)
     public void testGetAll() {
-        List<Film> films = filmService.getAll();
+        List<Film> films = filmDbStorage.getAll();
         List<Film> emptyFilmsList = new ArrayList<>();
 
         assertEquals(emptyFilmsList, films);
@@ -45,16 +43,16 @@ class FilmDbStorageTest {
 
     @Test
     @Order(2)
-    public void testGetNoFilmThrowsNotFoundException() {
-        NotFoundException thrown = assertThrows(NotFoundException.class, () -> filmService.getById(1));
-        assertTrue(thrown.getMessage().contains("Film with id=1 not found"));
+    public void testGet() {
+        Film film = filmDbStorage.get(1);
+        assertNull(film);
     }
 
     @Test
     @Order(3)
     public void testCreate() {
-        filmService.create(testFilm);
-        Film createdFilm = filmService.getById(testFilm.getId());
+        filmDbStorage.create(testFilm);
+        Film createdFilm = filmDbStorage.get(testFilm.getId());
         assertEquals(testFilm, createdFilm);
     }
 
@@ -63,24 +61,24 @@ class FilmDbStorageTest {
     public void testUpdate() {
         Film filmToUpdate = testFilm;
         filmToUpdate.setName("Updated Name");
-        filmService.update(filmToUpdate);
-        Film updatedFilm = filmService.getById(filmToUpdate.getId());
+        filmDbStorage.update(filmToUpdate);
+        Film updatedFilm = filmDbStorage.get(filmToUpdate.getId());
 
         assertEquals(filmToUpdate, updatedFilm);
     }
 
     @Test
     public void testGetCommonFilms() {
-        filmService.create(testFilm);
+        filmDbStorage.create(testFilm);
         testUser.setEmail("stu1@mail");
         testUser.setLogin("stu2Login");
         userDbStorage.create(testUser);
         testFriend.setEmail("stu2@mail");
         testFriend.setLogin("stu2@mail");
         userDbStorage.create(testFriend);
-        filmService.addLike(testUser.getId(), testFilm.getId());
-        filmService.addLike(testFriend.getId(), testFilm.getId());
-        assertEquals(testFilm, filmService.getCommonFilms(testUser.getId(), testFriend.getId()).get(0),
+        filmDbStorage.addLike(testUser, testFilm);
+        filmDbStorage.addLike(testFriend, testFilm);
+        assertEquals(testFilm, filmDbStorage.getCommonFilms(testUser.getId(), testFriend.getId()).get(0),
                 "Выборка 'Общие фильмы' (из одного элемента)  не совпадает с исходной");
     }
 }

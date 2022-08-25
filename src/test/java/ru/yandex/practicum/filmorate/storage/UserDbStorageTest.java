@@ -26,6 +26,7 @@ import static org.junit.jupiter.api.Assertions.*;
 class UserDbStorageTest {
 
     private final UserDbStorage userDbStorage;
+    private final FilmDbStorage filmDbStorage;
     private final EventDbStorage eventDbStorage;
     private final User testUser = EntitiesForTests.getTestUser();
     private final Film testFilm = EntitiesForTests.getTestFilm();
