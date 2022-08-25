@@ -17,11 +17,11 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Repository
-public class DirectorRepository implements IDirectorRepository{
+public class DirectorDbStorage implements DirectorStorage {
 
     private final JdbcTemplate jdbcTemplate;
 
-    public DirectorRepository(JdbcTemplate jdbcTemplate) {
+    public DirectorDbStorage(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
     }
 
