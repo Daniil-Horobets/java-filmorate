@@ -20,9 +20,8 @@ public class EntitiesForTests {
             LocalDate.now(),
             120,
             new Mpa(1, null),
-            new HashSet<>(),
             new ArrayList<>(),
-            new HashSet<>()
+            new ArrayList<>()
     );
 
     private static final User testUser = new User(
