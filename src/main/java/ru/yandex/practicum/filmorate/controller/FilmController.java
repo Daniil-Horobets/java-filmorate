@@ -43,11 +43,26 @@ public class FilmController {
         return filmService.getById(id);
     }
 
+    @PutMapping("/{filmId}/mark/{userId}")
+    public void addMark (@PathVariable int filmId,
+                         @PathVariable int userId,
+                         @RequestParam(value = "mark", required = true) Optional<Integer> mark) {
+
+        log.info("Request endpoint: 'PUT /films/{}/mark/{}?mark={}'", filmId, userId, mark);
+        filmService.addMark(userId, filmId, mark);
+    }
+
     @GetMapping("/search")
     public List<Film> getFilmsByQuery (@RequestParam String query,
                                        @RequestParam List<String> by) {
         log.info("Request endpoint: 'GET /films/search?query={}'", query);
         return filmService.getFilmsByQuery(query, by);
+    }
+
+    @DeleteMapping("/{filmId}/mark/{userId}")
+    public void deleteMark (@PathVariable int filmId, @PathVariable int userId) {
+        log.info("Request endpoint: 'DELETE /films/{}/like/{}'", filmId, userId);
+        filmService.deleteMark(userId, filmId);
     }
 
     @PutMapping("/{id}/like/{userId}")
@@ -56,19 +71,19 @@ public class FilmController {
         filmService.addLike(userId, id);
     }
 
-    @DeleteMapping("/{id}/like/{userId}")
-    public void deleteLike(@PathVariable int id, @PathVariable int userId) {
-        log.info("Request endpoint: 'DELETE /films/{}/like/{}'", id, userId);
-        filmService.deleteLike(userId, id);
+    @DeleteMapping("/{filmId}/like/{userId}")
+    public void deleteLike(@PathVariable int filmId, @PathVariable int userId) {
+        log.info("Request endpoint: 'DELETE /films/{}/like/{}'", filmId, userId);
+        filmService.deleteMark(userId, filmId);
     }
 
     @GetMapping("/popular")
-    public List<Film> getMostLikedFilms(
+    public List<Film> getBestFilms(
             @RequestParam(defaultValue = "10", name = "count") Integer count,
             @RequestParam(required = false, name = "genreId") Optional<Integer> genreId,
             @RequestParam(required = false, name = "year") Optional<Integer> year) {
         log.info("Request endpoint: 'GET /films/popular?count={}&genreId={}&year={}'", count, genreId, year);
-        return filmService.getMostLikedFilms(count, genreId, year);
+        return filmService.getBestFilms(count, genreId, year);
     }
 
     @GetMapping("/common")

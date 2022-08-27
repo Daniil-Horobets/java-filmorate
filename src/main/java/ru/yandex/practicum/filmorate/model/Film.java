@@ -1,9 +1,12 @@
 package ru.yandex.practicum.filmorate.model;
 
 import lombok.*;
+import net.minidev.json.annotate.JsonIgnore;
 
 import java.time.LocalDate;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Getter
 @Setter
@@ -20,5 +23,6 @@ public class Film {
     private Mpa mpa;
     private List<Genre> genres;
     private List<Director> directors;
-
+    @JsonIgnore
+    private String userRating;
 }
