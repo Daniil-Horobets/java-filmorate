@@ -4,7 +4,6 @@ import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
 import ru.yandex.practicum.filmorate.validator.FilmValidator;
@@ -73,9 +72,6 @@ public class FilmService {
     public List<Film> getBestFilms(Integer count, Optional<Integer> genreId, Optional<Integer> year) {
 
         return filmStorage.readBestFilms(count, genreId, year);
-    public List<Film> getMostLikedFilms(Integer count, Optional<Integer> genreId, Optional<Integer> year) {
-        return filmStorage.getMostLikedFilms(count, genreId, year);
-
     }
 
     public List<Film> getCommonFilms(int userId, int friendId) {

@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.model.Director;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
-import ru.yandex.practicum.filmorate.storage.IDirectorRepository;
+import ru.yandex.practicum.filmorate.storage.DirectorStorage;
 
 import java.util.Collection;
 import java.util.List;

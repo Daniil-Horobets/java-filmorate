@@ -45,7 +45,6 @@ public class FilmDbStorage implements FilmStorage {
                             "where locate(lower(?), lower(f.film_name)) GROUP BY f.film_id, fr.film_rating ORDER BY fr.film_rating DESC";
             return jdbcTemplate.query(sqlQuery, this::mapToFilm, query);
         }
-
         if (by.size() == 1 && by.get(0).equals("director")) {
             final String sqlQuery =
                     "SELECT * " +
@@ -56,7 +55,6 @@ public class FilmDbStorage implements FilmStorage {
                             "WHERE locate(lower(?), lower(d.director_name)) GROUP BY f.film_id, fr.film_rating ORDER BY fr.film_rating DESC";
             return jdbcTemplate.query(sqlQuery, this::mapToFilm, query);
         }
-
         if (by.containsAll((List.of("title", "director")))) {
             final String sqlQuery =
                     "SELECT * " +
@@ -209,7 +207,6 @@ public class FilmDbStorage implements FilmStorage {
         if (directorStorage.read(directorId).isEmpty()) {
             return null;
         }
-
         String sqlQuery;
 
         if (param.equals("likes")) {
@@ -309,23 +306,4 @@ public class FilmDbStorage implements FilmStorage {
             return false;
         }
     }
-
-    @Override
-    public List<Film> getMostLikedFilms(Integer count, Optional<Integer> genreId, Optional<Integer> year) {
-        String sqlQuery;
-        if (genreId.isEmpty() && year.isEmpty()) {
-            sqlQuery = "SELECT * FROM films f JOIN MPA M on f.FILM_MPA_ID = M.MPA_ID LEFT JOIN likes fl ON f.film_id = fl.film_id GROUP BY f.FILM_ID, fl.film_id, fl.user_id ORDER BY COUNT(fl.FILM_ID) DESC LIMIT ?";
-            return jdbcTemplate.query(sqlQuery, this::mapToFilm, count);
-        } else if (!genreId.isEmpty() && year.isEmpty()) {
-            sqlQuery = "SELECT * FROM films f JOIN MPA M on f.FILM_MPA_ID = M.MPA_ID JOIN GENRES_OF_FILMS fg ON f.FILM_ID = fg.FILM_ID AND fg.GENRE_ID=? LEFT JOIN likes fl ON f.film_id = fl.film_id GROUP BY f.FILM_ID, fl.film_id, fl.user_id ORDER BY COUNT(fl.FILM_ID) DESC LIMIT ?";
-            return jdbcTemplate.query(sqlQuery, this::mapToFilm, genreId.get(), count);
-        } else if (genreId.isEmpty() && !year.isEmpty()) {
-            sqlQuery = "SELECT * FROM films f JOIN MPA M on f.FILM_MPA_ID = M.MPA_ID LEFT JOIN likes fl ON f.film_id = fl.film_id WHERE YEAR(f.FILM_RELEASE_DATE)=? GROUP BY f.FILM_ID, fl.film_id, fl.user_id ORDER BY COUNT(fl.FILM_ID) DESC LIMIT ?";
-            return jdbcTemplate.query(sqlQuery, this::mapToFilm, year.get(), count);
-        }
-        sqlQuery = "SELECT * FROM films f JOIN MPA M on f.FILM_MPA_ID = M.MPA_ID JOIN GENRES_OF_FILMS fg ON f.FILM_ID = fg.FILM_ID AND fg.GENRE_ID=? LEFT JOIN likes fl ON f.film_id = fl.film_id WHERE YEAR(f.FILM_RELEASE_DATE)=? GROUP BY f.FILM_ID, fl.film_id, fl.user_id ORDER BY COUNT(fl.FILM_ID) DESC LIMIT ?";
-        return jdbcTemplate.query(sqlQuery, this::mapToFilm, genreId.get(), year.get(), count);
-
-    }
-
 }
