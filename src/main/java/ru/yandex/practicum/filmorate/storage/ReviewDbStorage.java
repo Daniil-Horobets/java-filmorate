@@ -57,7 +57,7 @@ public class ReviewDbStorage implements ReviewStorage{
         int id = simpleJdbcInsert.executeAndReturnKey(review.toMap()).intValue();
 
         return new Review(id,review.getContent(), review.getIsPositive()
-                            , review.getUserId(), review.getFilmId(), 0);
+                , review.getUserId(), review.getFilmId(), 0);
     }
 
     @Override
@@ -116,12 +116,12 @@ public class ReviewDbStorage implements ReviewStorage{
 
     private Review mapToReview(ResultSet resultSet, int rowNum) throws SQLException {
         Review review = new Review(
-        resultSet.getInt("review_id"),
-        resultSet.getString("review_content"),
-        resultSet.getBoolean("review_is_positive"),
-        resultSet.getInt("user_id"),
-        resultSet.getInt("film_id"),
-        resultSet.getInt("review_usefulness")
+                resultSet.getInt("review_id"),
+                resultSet.getString("review_content"),
+                resultSet.getBoolean("review_is_positive"),
+                resultSet.getInt("user_id"),
+                resultSet.getInt("film_id"),
+                resultSet.getInt("review_usefulness")
         );
         return review;
     }

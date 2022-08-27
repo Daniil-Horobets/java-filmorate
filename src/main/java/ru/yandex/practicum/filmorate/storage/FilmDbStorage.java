@@ -45,6 +45,7 @@ public class FilmDbStorage implements FilmStorage {
                             "where locate(lower(?), lower(f.film_name)) GROUP BY f.film_id, fr.film_rating ORDER BY fr.film_rating DESC";
             return jdbcTemplate.query(sqlQuery, this::mapToFilm, query);
         }
+
         if (by.size() == 1 && by.get(0).equals("director")) {
             final String sqlQuery =
                     "SELECT * " +
@@ -55,6 +56,7 @@ public class FilmDbStorage implements FilmStorage {
                             "WHERE locate(lower(?), lower(d.director_name)) GROUP BY f.film_id, fr.film_rating ORDER BY fr.film_rating DESC";
             return jdbcTemplate.query(sqlQuery, this::mapToFilm, query);
         }
+
         if (by.containsAll((List.of("title", "director")))) {
             final String sqlQuery =
                     "SELECT * " +
@@ -147,7 +149,6 @@ public class FilmDbStorage implements FilmStorage {
                 jdbcTemplate.update(sqlQuery2, filmId, filmRating.get());
             }
         } catch (NullPointerException e) {
-            return;
         }
     }
 
@@ -161,7 +162,6 @@ public class FilmDbStorage implements FilmStorage {
                 deleteMark(userId, filmId);
             }
         } catch (EmptyResultDataAccessException e) {
-            return;
         }
     }
 
@@ -207,6 +207,7 @@ public class FilmDbStorage implements FilmStorage {
         if (directorStorage.read(directorId).isEmpty()) {
             return null;
         }
+
         String sqlQuery;
 
         if (param.equals("likes")) {
@@ -242,7 +243,7 @@ public class FilmDbStorage implements FilmStorage {
         } else if (genreId.isEmpty() && !year.isEmpty()) {
             sqlQuery = "SELECT * FROM films f JOIN MPA M on f.film_mpa_id = M.mpa_id " +
                     "LEFT JOIN film_ratings fr ON f.film_id = fr.film_id WHERE YEAR(f.FILM_RELEASE_DATE)=? " +
-                    "GROUP BY f.film_id, fr.film_rating ORDER BY fr.film_id DESC LIMIT ?";
+                    "GROUP BY f.film_id, fr.film_rating ORDER BY fr.film_rating DESC LIMIT ?";
             return jdbcTemplate.query(sqlQuery, this::mapToFilm, year.get(), count);
         }
         sqlQuery = "SELECT * FROM films f JOIN MPA M on f.film_mpa_id = M.mpa_id " +

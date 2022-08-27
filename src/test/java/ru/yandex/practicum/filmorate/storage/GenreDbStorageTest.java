@@ -7,14 +7,13 @@ import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabas
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
 import resources.EntitiesForTests;
+import ru.yandex.practicum.filmorate.model.Director;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
 
 import java.util.List;
-import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
 @SpringBootTest
 @AutoConfigureTestDatabase
@@ -23,9 +22,12 @@ import static org.junit.jupiter.api.Assertions.assertNotEquals;
 class GenreDbStorageTest {
 
     private final GenreDbStorage genreDbStorage;
-    private final FilmStorage filmStorage;
+
+    private final FilmDbStorage filmDbStorage;
+    private final DirectorStorage directorStorage;
 
     private final Film testFilm = EntitiesForTests.getTestFilm();
+    private final Director testDirector = EntitiesForTests.getTestDirector();
 
     @Test
     public void testGetAll() {
@@ -51,11 +53,13 @@ class GenreDbStorageTest {
 
     @Test
     public void testSetFilmGenre() {
-        testFilm.setGenres(Set.of(genreDbStorage.get(1)));
-        filmStorage.create(testFilm);
+        directorStorage.create(testDirector);
+        testFilm.setGenres(List.of(genreDbStorage.get(1)));
+        System.out.println(testFilm);
+        filmDbStorage.create(testFilm);
         genreDbStorage.setFilmGenre(testFilm);
 
-        assertEquals(Set.of(genreDbStorage.get(1)), filmDbStorage.get(testFilm.getId()).getGenres());
+        assertEquals(1, filmDbStorage.get(testFilm.getId()).getGenres().get(0).getId());
     }
 
     @Test

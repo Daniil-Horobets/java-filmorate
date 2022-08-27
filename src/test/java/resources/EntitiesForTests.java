@@ -20,7 +20,7 @@ public class EntitiesForTests {
             LocalDate.of(1998, 11 , 5),
             120,
             new Mpa(1, null),
-            new HashSet<>(Set.of(new Genre(1,null))),
+            new ArrayList<>(List.of(new Genre(1,null))),
             new ArrayList<>(List.of(new Director(1, null))),
             null
     );
@@ -32,7 +32,7 @@ public class EntitiesForTests {
             LocalDate.of(1998, 10 , 5),
             120,
             new Mpa(1, null),
-            new HashSet<>(Set.of(new Genre(2,null))),
+            new ArrayList<>(List.of(new Genre(2,null))),
             new ArrayList<>(List.of(new Director(1, null))),
             null
     );
@@ -44,7 +44,7 @@ public class EntitiesForTests {
             LocalDate.of(2008, 9 , 5),
             120,
             new Mpa(1, null),
-            new HashSet<>(Set.of(new Genre(1,null))),
+            new ArrayList<>(List.of(new Genre(1,null))),
             new ArrayList<>(List.of(new Director(2, null))),
             null
     );
@@ -56,7 +56,7 @@ public class EntitiesForTests {
             LocalDate.of(2008, 7 , 5),
             120,
             new Mpa(1, null),
-            new HashSet<>(Set.of(new Genre(2,null))),
+            new ArrayList<>(List.of(new Genre(2,null))),
             new ArrayList<>(List.of(new Director(2, null))),
             null
     );
@@ -68,7 +68,7 @@ public class EntitiesForTests {
             LocalDate.of(2008, 1 , 5),
             120,
             new Mpa(1, null),
-            new HashSet<>(Set.of(new Genre(1,null))),
+            new ArrayList<>(List.of(new Genre(1,null))),
             new ArrayList<>(List.of(new Director(1, null))),
             null
     );
