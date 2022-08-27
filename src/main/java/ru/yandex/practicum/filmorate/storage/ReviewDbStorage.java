@@ -25,10 +25,7 @@ public class ReviewDbStorage implements ReviewStorage{
         final String sqlQuery =
                 "SELECT * FROM reviews ORDER BY review_usefulness DESC LIMIT ?";
         List<Review> reviews = jdbcTemplate.query(sqlQuery, this::mapToReview, count);
-        for (Review review: reviews) {
-            loadLikesAndDislikes(review);
-        }
-        return reviews;
+        return updateReviewsLikesAndDislikes(reviews);
     }
 
     @Override
@@ -36,10 +33,7 @@ public class ReviewDbStorage implements ReviewStorage{
         final String sqlQuery =
                 "SELECT * FROM reviews WHERE film_id = ? ORDER BY review_usefulness DESC LIMIT ?";
         List<Review> reviews = jdbcTemplate.query(sqlQuery, this::mapToReview, filmId, count);
-        for (Review review: reviews) {
-            loadLikesAndDislikes(review);
-        }
-        return reviews;
+        return updateReviewsLikesAndDislikes(reviews);
     }
 
     @Override
@@ -148,5 +142,10 @@ public class ReviewDbStorage implements ReviewStorage{
                 , (resultSet, rowNum) -> (resultSet.getInt("user_id"))
                 , reviewId, ReviewReaction.DISLIKE.toString().toLowerCase());
         return new HashSet<>(likedUsersIds);
+    }
+
+    private List<Review> updateReviewsLikesAndDislikes(List<Review> reviews) {
+        reviews.forEach(this::loadLikesAndDislikes);
+        return reviews;
     }
 }
